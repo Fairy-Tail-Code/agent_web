@@ -1,0 +1,88 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            set -e
+
+            # 部署根目录
+            DEPLOY_ROOT=/opt/agent_manage
+            BACKEND_DIR=$DEPLOY_ROOT/agent_web
+            FRONTEND_DIR=$DEPLOY_ROOT/agent-web-fronted-2
+
+            echo "=== 创建部署目录 ==="
+            mkdir -p $DEPLOY_ROOT
+
+            # 首次部署：clone 仓库（如果目录不存在）
+            if [ ! -d "$BACKEND_DIR/.git" ]; then
+              echo "=== 首次部署：clone 后端仓库 ==="
+              git clone https://github.com/iamikunnnnn/agent_web.git $BACKEND_DIR
+            fi
+
+            if [ ! -d "$FRONTEND_DIR/.git" ]; then
+              echo "=== 首次部署：clone 前端仓库 ==="
+              git clone https://github.com/Fairy-Tail-Code/agent-web-fronted.git $FRONTEND_DIR
+            fi
+
+            # 拉取最新代码
+            echo "=== 拉取后端最新代码 ==="
+            cd $BACKEND_DIR
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "=== 拉取前端最新代码 ==="
+            cd $FRONTEND_DIR
+            git fetch origin main
+            git reset --hard origin/main
+
+            # 确保 .env 文件存在
+            if [ ! -f "$BACKEND_DIR/.env" ]; then
+              echo "⚠️  警告: $BACKEND_DIR/.env 不存在！"
+              echo "请手动创建 .env 文件后再部署"
+              exit 1
+            fi
+
+            # 确保 SSL 证书目录存在
+            mkdir -p $BACKEND_DIR/deploy/nginx/ssl
+            if [ ! -f "$BACKEND_DIR/deploy/nginx/ssl/cert.pem" ] || [ ! -f "$BACKEND_DIR/deploy/nginx/ssl/key.pem" ]; then
+              echo "⚠️  警告: SSL 证书不存在，使用自签名证书（仅用于测试）"
+              # 如果有正式证书可以跳过这步
+              if [ ! -f "$BACKEND_DIR/deploy/nginx/ssl/cert.pem" ]; then
+                openssl req -x509 -nodes -days 365 \
+                  -newkey rsa:2048 \
+                  -keyout $BACKEND_DIR/deploy/nginx/ssl/key.pem \
+                  -out $BACKEND_DIR/deploy/nginx/ssl/cert.pem \
+                  -subj "/CN=agloop.cn" 2>/dev/null || true
+              fi
+            fi
+
+            # 停止旧容器，重新构建并启动
+            echo "=== 构建并启动服务 ==="
+            cd $BACKEND_DIR
+            docker compose down --remove-orphans
+            docker compose build --no-cache
+            docker compose up -d
+
+            # 等待服务启动
+            echo "=== 等待服务启动 ==="
+            sleep 10
+
+            # 检查容器状态
+            echo "=== 容器状态 ==="
+            docker compose ps
+
+            echo "=== 部署完成 ==="
