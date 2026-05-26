@@ -100,7 +100,6 @@ jobs:
             deploy/nginx/nginx.conf
             deploy/nginx/jwt_verify.lua
           target: /opt/agent_web/agent_web
-          strip_components: 1
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
