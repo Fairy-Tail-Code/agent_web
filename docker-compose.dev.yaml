@@ -174,8 +174,8 @@ services:
 
   gateway:
     build:
-      context: .
-      dockerfile: deploy/nginx/Dockerfile
+      context: ..
+      dockerfile: agent_web/deploy/nginx/Dockerfile
     depends_on:
       app:
         condition: service_healthy

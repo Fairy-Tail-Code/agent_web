@@ -15,7 +15,7 @@ COPY agent-web-fronted/.env* ./
 COPY agent-web-fronted/scripts ./scripts
 COPY agent-web-fronted/src ./src
 
-RUN npm install --force --omit=optional
+RUN npm install --force --platform=linux
 RUN npm run build
 
 FROM openresty/openresty:alpine-fat
