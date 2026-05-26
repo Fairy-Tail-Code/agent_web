@@ -126,7 +126,7 @@ services:
       - ./config:/app/config
       - ./auth:/app/auth
       - ./knowledge:/app/knowledge
-      ./tools:/app/tools
+      - ./tools:/app/tools
     expose:
       - "8005"
     depends_on:
