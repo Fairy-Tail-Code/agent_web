@@ -4,6 +4,7 @@ import os
 import uvicorn
 from agno.utils.log import log_info
 
+
 def _get_bool_env(name: str, default: bool) -> bool:
     raw = os.getenv(name)
     if raw is None:
