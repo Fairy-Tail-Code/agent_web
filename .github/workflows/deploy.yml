@@ -84,6 +84,24 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout backend
+        uses: actions/checkout@v4
+
+      # 把部署所需的配置文件传到服务器（不再让服务器访问 GitHub）
+      - name: Upload config files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: |
+            docker-compose.prod.yaml
+            deploy/nginx/nginx.conf
+            deploy/nginx/jwt_verify.lua
+          target: /opt/agent_web/agent_web
+          strip_components: 1
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -94,27 +112,19 @@ jobs:
           script: |
             set -e
 
-            DEPLOY_DIR=/opt/agent_web
-            BACKEND_DIR=$DEPLOY_DIR/agent_web
-
-            # 首次部署：克隆仓库
-            if [ ! -d "$BACKEND_DIR/.git" ]; then
-              mkdir -p $DEPLOY_DIR
-              git clone https://github.com/iamikunnnnn/agent_web.git $BACKEND_DIR
-            fi
-
-            # 拉取最新代码（需要 docker-compose.prod.yaml 和 nginx 配置等）
-            cd $BACKEND_DIR
-            git fetch origin main
-            git reset --hard origin/main
+            DEPLOY_DIR=/opt/agent_web/agent_web
+            cd $DEPLOY_DIR
 
             # 确保 .env 存在
             if [ ! -f ".env" ]; then
-              echo "❌ .env 文件不存在！请先在服务器上手动创建 $BACKEND_DIR/.env"
+              echo "❌ .env 文件不存在！请先在服务器上手动创建 $DEPLOY_DIR/.env"
               exit 1
             fi
 
-            # 用生产 compose 文件启动（只拉取镜像，不构建）
+            # 确保 SSL 目录存在
+            mkdir -p deploy/nginx/ssl
+
+            # 拉取最新镜像并启动
             docker compose -f docker-compose.prod.yaml pull
             docker compose -f docker-compose.prod.yaml down --remove-orphans
             docker compose -f docker-compose.prod.yaml up -d
