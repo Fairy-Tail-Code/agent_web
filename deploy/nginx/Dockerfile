@@ -6,13 +6,13 @@ RUN apt-get update \
 
 WORKDIR /build/frontend
 
-COPY agent-web-fronted-2/package.json agent-web-fronted-2/package-lock.json ./
-COPY agent-web-fronted-2/index.html ./
-COPY agent-web-fronted-2/tsconfig.json ./
-COPY agent-web-fronted-2/vite.config.ts ./
-COPY agent-web-fronted-2/.env ./.env
-COPY agent-web-fronted-2/scripts ./scripts
-COPY agent-web-fronted-2/src ./src
+COPY agent-web-fronted/package.json agent-web-fronted/package-lock.json ./
+COPY agent-web-fronted/index.html ./
+COPY agent-web-fronted/tsconfig.json ./
+COPY agent-web-fronted/vite.config.ts ./
+COPY agent-web-fronted/.env ./.env
+COPY agent-web-fronted/scripts ./scripts
+COPY agent-web-fronted/src ./src
 
 RUN npm ci
 RUN npm run build
