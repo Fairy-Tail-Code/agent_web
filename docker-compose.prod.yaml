@@ -1,0 +1,194 @@
+# 生产环境 Docker Compose —— 使用预构建镜像，不在服务器上编译
+# 由 CI/CD 调用：docker compose -f docker-compose.prod.yaml up -d
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: ${DB_NAME:-agent_db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    expose:
+      - "5432"
+    volumes:
+      - agent_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-agent_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - agent_backend
+
+  data-mcp:
+    image: zhangwei12138/agent-backend:latest
+    command: python data_mcp_main.py
+    env_file:
+      - .env
+    environment:
+      DB_DRIVER: postgresql+psycopg
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-agent_db}
+      DATA_DB_PATH: /app/user_cache/data/data.db
+      DATA_UPLOAD_DIR: /app/user_cache/workspace
+      ML_MODEL_DIR: /app/user_cache/ml_models
+    expose:
+      - "8085"
+    volumes:
+      - agent_user_cache:/app/user_cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket,sys; s=socket.socket(); s.settimeout(2); s.connect(('127.0.0.1', 8085)); s.close()"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - agent_backend
+
+  docx-use-mcp:
+    image: zhangwei12138/agent-backend:latest
+    command: python docx_use_mcp_main.py
+    env_file:
+      - .env
+    environment:
+      DB_DRIVER: postgresql+psycopg
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-agent_db}
+      MCP_TRANSPORT: streamable-http
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "8008"
+      OFFICE_BASE_DIR: /app/user_cache/office
+    expose:
+      - "8008"
+    volumes:
+      - agent_user_cache:/app/user_cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket,sys; s=socket.socket(); s.settimeout(2); s.connect(('127.0.0.1', 8008)); s.close()"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - agent_backend
+
+  app:
+    image: zhangwei12138/agent-backend:latest
+    command: python main.py
+    env_file:
+      - .env
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: "8005"
+      UVICORN_RELOAD: "false"
+      UVICORN_LOG_LEVEL: info
+      ENABLE_OTLP_TRACING: "false"
+      DB_DRIVER: postgresql+psycopg
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-agent_db}
+      DATA_DB_PATH: /app/user_cache/data/data.db
+      DATA_MCP_URL: http://data-mcp:8085/mcp
+      DOCX_USE_MCP_URL: http://docx-use-mcp:8008/mcp
+      DATA_UPLOAD_DIR: /app/user_cache/workspace
+      ML_MODEL_DIR: /app/user_cache/ml_models
+      OFFICE_BASE_DIR: /app/user_cache/office
+    volumes:
+      - agent_user_cache:/app/user_cache
+    expose:
+      - "8005"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      data-mcp:
+        condition: service_healthy
+      docx-use-mcp:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; import sys; sys.exit(0 if urlopen('http://127.0.0.1:8005/openapi.json').status == 200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 25s
+    restart: unless-stopped
+    networks:
+      - agent_backend
+
+  frontend-adapter:
+    image: zhangwei12138/agent-frontend-adapter:latest
+    environment:
+      NODE_ENV: production
+      SERVICE_BASE_URL: http://gateway/backend
+      SERVICE_ADAPTER_PORT: "4000"
+      SERVICE_ADAPTER_SQLITE_PATH: /data/copilotkit-runtime.sqlite
+    expose:
+      - "4000"
+    volumes:
+      - agent_frontend_adapter_data:/data
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/health').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - agent_backend
+
+  gateway:
+    image: zhangwei12138/agent-gateway:latest
+    depends_on:
+      app:
+        condition: service_healthy
+      frontend-adapter:
+        condition: service_healthy
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./deploy/nginx/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+      - ./deploy/nginx/jwt_verify.lua:/etc/openresty/jwt_verify.lua:ro
+      - ./deploy/nginx/ssl:/etc/nginx/ssl:ro
+    environment:
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_JWKS_URL: ${SUPABASE_JWKS_URL:-}
+      SUPABASE_JWT_AUDIENCE: ${SUPABASE_JWT_AUDIENCE:-authenticated}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - agent_backend
+
+networks:
+  agent_backend:
+    driver: bridge
+
+volumes:
+  agent_user_cache:
+  agent_pg_data:
+  agent_frontend_adapter_data:

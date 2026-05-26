@@ -1,0 +1,211 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: ${DB_NAME:-agent_db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    expose:
+      - "5432"
+    volumes:
+      - agent_pg_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-agent_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - agent_backend_dev
+
+  data-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python data_mcp_main.py
+    env_file:
+      - .env
+    environment:
+      DB_DRIVER: postgresql+psycopg
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-agent_db}
+      DATA_DB_PATH: /app/user_cache/data/data.db
+      DATA_UPLOAD_DIR: /app/user_cache/workspace
+      ML_MODEL_DIR: /app/user_cache/ml_models
+    expose:
+      - "8085"
+    volumes:
+      - agent_user_cache_dev:/app/user_cache
+      - ./api:/app/api
+      - ./agent:/app/agent
+      - ./config:/app/config
+      - ./auth:/app/auth
+      - ./knowledge:/app/knowledge
+      - ./tools:/app/tools
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.settimeout(2); s.connect(('127.0.0.1', 8085)); s.close()"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - agent_backend_dev
+
+  docx-use-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python docx_use_mcp_main.py
+    env_file:
+      - .env
+    environment:
+      DB_DRIVER: postgresql+psycopg
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-agent_db}
+      MCP_TRANSPORT: streamable-http
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "8008"
+      OFFICE_BASE_DIR: /app/user_cache/office
+    expose:
+      - "8008"
+    volumes:
+      - agent_user_cache_dev:/app/user_cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.settimeout(2); s.connect(('127.0.0.1', 8008)); s.close()"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - agent_backend_dev
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python main.py
+    env_file:
+      - .env
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: "8005"
+      UVICORN_RELOAD: "true"  # 开发环境启用热重载
+      UVICORN_LOG_LEVEL: info
+      ENABLE_OTLP_TRACING: "false"
+      DB_DRIVER: postgresql+psycopg
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-agent_db}
+      DATA_DB_PATH: /app/user_cache/data/data.db
+      DATA_MCP_URL: http://data-mcp:8085/mcp
+      DOCX_USE_MCP_URL: http://docx-use-mcp:8008/mcp
+      DATA_UPLOAD_DIR: /app/user_cache/workspace
+      ML_MODEL_DIR: /app/user_cache/ml_models
+      OFFICE_BASE_DIR: /app/user_cache/office
+    volumes:
+      - agent_user_cache_dev:/app/user_cache
+      - ./api:/app/api
+      - ./agent:/app/agent
+      - ./config:/app/config
+      - ./auth:/app/auth
+      - ./knowledge:/app/knowledge
+      ./tools:/app/tools
+    expose:
+      - "8005"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      data-mcp:
+        condition: service_healthy
+      docx-use-mcp:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; import sys; sys.exit(0 if urlopen('http://127.0.0.1:8005/openapi.json').status == 200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 25s
+    restart: unless-stopped
+    networks:
+      - agent_backend_dev
+
+  frontend-adapter:
+    build:
+      context: ../agent-web-fronted
+      dockerfile: Dockerfile.adapter
+    environment:
+      NODE_ENV: development
+      SERVICE_BASE_URL: http://gateway/backend
+      SERVICE_ADAPTER_PORT: "4000"
+      SERVICE_ADAPTER_SQLITE_PATH: /data/copilotkit-runtime.sqlite
+    expose:
+      - "4000"
+    volumes:
+      - agent_frontend_adapter_data_dev:/data
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/health').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - agent_backend_dev
+
+  gateway:
+    build:
+      context: .
+      dockerfile: deploy/nginx/Dockerfile
+    depends_on:
+      app:
+        condition: service_healthy
+      frontend-adapter:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    volumes:
+      - ./deploy/nginx/nginx.dev.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+      - ./deploy/nginx/jwt_verify.lua:/etc/openresty/jwt_verify.lua:ro
+    environment:
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_JWKS_URL: ${SUPABASE_JWKS_URL}
+      SUPABASE_JWT_AUDIENCE: ${SUPABASE_JWT_AUDIENCE:-authenticated}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - agent_backend_dev
+
+networks:
+  agent_backend_dev:
+    driver: bridge
+
+volumes:
+  agent_user_cache_dev:
+  agent_pg_data_dev:
+  agent_frontend_adapter_data_dev:

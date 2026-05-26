@@ -1,12 +1,87 @@
-name: Deploy to Production
+name: Build & Deploy
 
 on:
   push:
     branches: [main]
   workflow_dispatch:  # 允许手动触发
 
+env:
+  DOCKERHUB_REPO: zhangwei12138
+
 jobs:
+  # ── 构建并推送镜像 ──────────────────────────────────
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout backend
+        uses: actions/checkout@v4
+
+      - name: Checkout frontend (sibling dir)
+        uses: actions/checkout@v4
+        with:
+          repository: Fairy-Tail-Code/agent-web-fronted
+          path: agent-web-fronted
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ── 构建后端 Python 镜像（app / data-mcp / docx-use-mcp 共用）──
+      - name: Build & push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKERHUB_REPO }}/agent-backend:${{ github.sha }}
+            ${{ env.DOCKERHUB_REPO }}/agent-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ── 构建前端 adapter 镜像 ──
+      - name: Build & push frontend-adapter image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./agent-web-fronted
+          file: ./agent-web-fronted/Dockerfile.adapter
+          push: true
+          tags: |
+            ${{ env.DOCKERHUB_REPO }}/agent-frontend-adapter:${{ github.sha }}
+            ${{ env.DOCKERHUB_REPO }}/agent-frontend-adapter:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ── 构建 gateway (nginx + 前端静态资源) ──
+      # gateway Dockerfile 的 context 原本是 .. (父目录)，因为要 COPY agent-web-fronted/
+      # CI 中前端已 clone 为子目录 agent-web-fronted，所以 context 用当前目录即可
+      # 但 Dockerfile 里 COPY 路径是 agent-web-fronted/xxx，我们需要在根目录下有这个目录
+      - name: Move frontend for gateway build context
+        run: |
+          # Dockerfile 里用 agent-web-fronted-2/... 路径，在 context=. 下刚好能找到
+          ls -la agent-web-fronted-2/ | head -5
+
+      - name: Build & push gateway image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./deploy/nginx/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKERHUB_REPO }}/agent-gateway:${{ github.sha }}
+            ${{ env.DOCKERHUB_REPO }}/agent-gateway:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ── 部署到服务器 ──────────────────────────────────
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Deploy via SSH
@@ -19,70 +94,32 @@ jobs:
           script: |
             set -e
 
-            # 部署根目录
-            DEPLOY_ROOT=/opt/agent_manage
-            BACKEND_DIR=$DEPLOY_ROOT/agent_web
-            FRONTEND_DIR=$DEPLOY_ROOT/agent-web-fronted-2
+            DEPLOY_DIR=/opt/agent_web
+            BACKEND_DIR=$DEPLOY_DIR/agent_web
 
-            echo "=== 创建部署目录 ==="
-            mkdir -p $DEPLOY_ROOT
-
-            # 首次部署：clone 仓库（如果目录不存在）
+            # 首次部署：克隆仓库
             if [ ! -d "$BACKEND_DIR/.git" ]; then
-              echo "=== 首次部署：clone 后端仓库 ==="
+              mkdir -p $DEPLOY_DIR
               git clone https://github.com/iamikunnnnn/agent_web.git $BACKEND_DIR
             fi
 
-            if [ ! -d "$FRONTEND_DIR/.git" ]; then
-              echo "=== 首次部署：clone 前端仓库 ==="
-              git clone https://github.com/Fairy-Tail-Code/agent-web-fronted.git $FRONTEND_DIR
-            fi
-
-            # 拉取最新代码
-            echo "=== 拉取后端最新代码 ==="
+            # 拉取最新代码（需要 docker-compose.prod.yaml 和 nginx 配置等）
             cd $BACKEND_DIR
             git fetch origin main
             git reset --hard origin/main
 
-            echo "=== 拉取前端最新代码 ==="
-            cd $FRONTEND_DIR
-            git fetch origin main
-            git reset --hard origin/main
-
-            # 确保 .env 文件存在
-            if [ ! -f "$BACKEND_DIR/.env" ]; then
-              echo "⚠️  警告: $BACKEND_DIR/.env 不存在！"
-              echo "请手动创建 .env 文件后再部署"
+            # 确保 .env 存在
+            if [ ! -f ".env" ]; then
+              echo "❌ .env 文件不存在！请先在服务器上手动创建 $BACKEND_DIR/.env"
               exit 1
             fi
 
-            # 确保 SSL 证书目录存在
-            mkdir -p $BACKEND_DIR/deploy/nginx/ssl
-            if [ ! -f "$BACKEND_DIR/deploy/nginx/ssl/cert.pem" ] || [ ! -f "$BACKEND_DIR/deploy/nginx/ssl/key.pem" ]; then
-              echo "⚠️  警告: SSL 证书不存在，使用自签名证书（仅用于测试）"
-              # 如果有正式证书可以跳过这步
-              if [ ! -f "$BACKEND_DIR/deploy/nginx/ssl/cert.pem" ]; then
-                openssl req -x509 -nodes -days 365 \
-                  -newkey rsa:2048 \
-                  -keyout $BACKEND_DIR/deploy/nginx/ssl/key.pem \
-                  -out $BACKEND_DIR/deploy/nginx/ssl/cert.pem \
-                  -subj "/CN=agloop.cn" 2>/dev/null || true
-              fi
-            fi
+            # 用生产 compose 文件启动（只拉取镜像，不构建）
+            docker compose -f docker-compose.prod.yaml pull
+            docker compose -f docker-compose.prod.yaml down --remove-orphans
+            docker compose -f docker-compose.prod.yaml up -d
 
-            # 停止旧容器，重新构建并启动
-            echo "=== 构建并启动服务 ==="
-            cd $BACKEND_DIR
-            docker compose down --remove-orphans
-            docker compose build --no-cache
-            docker compose up -d
-
-            # 等待服务启动
-            echo "=== 等待服务启动 ==="
-            sleep 10
-
-            # 检查容器状态
-            echo "=== 容器状态 ==="
-            docker compose ps
-
-            echo "=== 部署完成 ==="
+            # 等待启动完成
+            sleep 15
+            docker compose -f docker-compose.prod.yaml ps
+            echo "✅ 部署完成！"

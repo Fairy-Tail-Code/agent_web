@@ -259,7 +259,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "agno", extras = ["agui"], git = "https://github.com/iamikunnnnn/agno.git?subdirectory=libs%2Fagno&rev=a471dba03190484fe8e0810c7318120045982f77" },
+    { name = "agno", extras = ["agui"], specifier = "==2.5.6" },
     { name = "aiofiles", specifier = "==25.1.0" },
     { name = "aiohappyeyeballs", specifier = "==2.6.1" },
     { name = "aiohttp", specifier = "==3.13.3" },
@@ -371,7 +371,7 @@ requires-dist = [
     { name = "oauthlib", specifier = "==3.3.1" },
     { name = "olefile", specifier = "==0.47" },
     { name = "ollama", specifier = "==0.6.1" },
-    { name = "onnxruntime", specifier = "==1.23.2" },
+    { name = "onnxruntime", specifier = "==1.17.1" },
     { name = "openai", specifier = "==2.16.0" },
     { name = "openapi-pydantic", specifier = "==0.5.1" },
     { name = "openinference-instrumentation", specifier = "==0.1.45" },
@@ -494,8 +494,8 @@ requires-dist = [
 
 [[package]]
 name = "agno"
-version = "2.5.10"
-source = { git = "https://github.com/iamikunnnnn/agno.git?subdirectory=libs%2Fagno&rev=a471dba03190484fe8e0810c7318120045982f77#a471dba03190484fe8e0810c7318120045982f77" }
+version = "2.5.6"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docstring-parser" },
     { name = "gitpython" },
@@ -510,6 +510,10 @@ dependencies = [
     { name = "rich" },
     { name = "typer" },
     { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/69/8a/d895e291b4404b22ef645acd40944fc6bc4d1e77a1c8bfba7098fa1ad648/agno-2.5.6.tar.gz", hash = "sha256:394f104c070c1be8dfff7494e6d7ba79d35f718af1351ce8b12ac524f3cadfad", size = 1745754, upload-time = "2026-03-02T20:21:03.343Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/71/37/f68c93153c1da33958c77f6925c4397e624beccecc0acff1b78e0574149d/agno-2.5.6-py3-none-any.whl", hash = "sha256:8fc6415664405731619ea056bef8236f2af144ac10c0f99176eeca2c4f1c46c3", size = 2084652, upload-time = "2026-03-02T20:21:01.347Z" },
 ]
 
 [package.optional-dependencies]
@@ -2307,7 +2311,7 @@ wheels = [
 
 [[package]]
 name = "onnxruntime"
-version = "1.23.2"
+version = "1.17.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "coloredlogs" },
@@ -2318,11 +2322,11 @@ dependencies = [
     { name = "sympy" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1b/9e/f748cd64161213adeef83d0cb16cb8ace1e62fa501033acdd9f9341fff57/onnxruntime-1.23.2-cp312-cp312-macosx_13_0_arm64.whl", hash = "sha256:b8f029a6b98d3cf5be564d52802bb50a8489ab73409fa9db0bf583eabb7c2321", size = 17195929, upload-time = "2025-10-22T03:47:36.24Z" },
-    { url = "https://files.pythonhosted.org/packages/91/9d/a81aafd899b900101988ead7fb14974c8a58695338ab6a0f3d6b0100f30b/onnxruntime-1.23.2-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:218295a8acae83905f6f1aed8cacb8e3eb3bd7513a13fe4ba3b2664a19fc4a6b", size = 19157705, upload-time = "2025-10-22T03:46:40.415Z" },
-    { url = "https://files.pythonhosted.org/packages/3c/35/4e40f2fba272a6698d62be2cd21ddc3675edfc1a4b9ddefcc4648f115315/onnxruntime-1.23.2-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:76ff670550dc23e58ea9bc53b5149b99a44e63b34b524f7b8547469aaa0dcb8c", size = 15226915, upload-time = "2025-10-22T03:46:27.773Z" },
-    { url = "https://files.pythonhosted.org/packages/ef/88/9cc25d2bafe6bc0d4d3c1db3ade98196d5b355c0b273e6a5dc09c5d5d0d5/onnxruntime-1.23.2-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:0f9b4ae77f8e3c9bee50c27bc1beede83f786fe1d52e99ac85aa8d65a01e9b77", size = 17382649, upload-time = "2025-10-22T03:47:02.782Z" },
-    { url = "https://files.pythonhosted.org/packages/c0/b4/569d298f9fc4d286c11c45e85d9ffa9e877af12ace98af8cab52396e8f46/onnxruntime-1.23.2-cp312-cp312-win_amd64.whl", hash = "sha256:25de5214923ce941a3523739d34a520aac30f21e631de53bba9174dc9c004435", size = 13470528, upload-time = "2025-10-22T03:47:28.106Z" },
+    { url = "https://files.pythonhosted.org/packages/a1/a2/00ea929ccf9b4702af11e13fa52e9ac607aecc867b041ffcbe646e29f880/onnxruntime-1.17.1-cp312-cp312-macosx_11_0_universal2.whl", hash = "sha256:40f08e378e0f85929712a2b2c9b9a9cc400a90c8a8ca741d1d92c00abec60843", size = 14774341, upload-time = "2024-02-25T08:08:06.694Z" },
+    { url = "https://files.pythonhosted.org/packages/36/82/764e94ca19ca5b694aeb777191d5973189d67e303bdf68e9df2147af267f/onnxruntime-1.17.1-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:ac79da6d3e1bb4590f1dad4bb3c2979d7228555f92bb39820889af8b8e6bd472", size = 5849157, upload-time = "2024-02-25T08:08:09.124Z" },
+    { url = "https://files.pythonhosted.org/packages/6f/75/f22390f6d216c52639400bb5e7d7f96d0c5445de5ca18f48dba17669e4e1/onnxruntime-1.17.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:ae9ba47dc099004e3781f2d0814ad710a13c868c739ab086fc697524061695ea", size = 6790530, upload-time = "2024-02-25T08:08:13.585Z" },
+    { url = "https://files.pythonhosted.org/packages/fa/a0/d24a8382c6a0d596690a06e981aef5a75a03bfc7cdc34f35fe7eb0a93988/onnxruntime-1.17.1-cp312-cp312-win32.whl", hash = "sha256:2dff1a24354220ac30e4a4ce2fb1df38cb1ea59f7dac2c116238d63fe7f4c5ff", size = 4935150, upload-time = "2024-02-25T08:08:16.845Z" },
+    { url = "https://files.pythonhosted.org/packages/81/e5/55699490257383a0a579b43eeea545680edc8f956f83fde1e16c5fd2359e/onnxruntime-1.17.1-cp312-cp312-win_amd64.whl", hash = "sha256:6226a5201ab8cafb15e12e72ff2a4fc8f50654e8fa5737c6f0bd57c5ff66827e", size = 5602101, upload-time = "2024-02-25T08:08:19.813Z" },
 ]
 
 [[package]]

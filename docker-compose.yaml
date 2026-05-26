@@ -155,7 +155,7 @@ services:  # 定义所有要启动的服务/容器
 
   frontend-adapter:  # 前端 adapter 服务，供统一网关转发 /api 和 /agui
     build:
-      context: ../agent-web-fronted-2
+      context: ../agent-web-fronted
       dockerfile: Dockerfile.adapter
     environment:
       NODE_ENV: production

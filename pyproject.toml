@@ -117,7 +117,7 @@ dependencies = [
     "oauthlib==3.3.1",
     "olefile==0.47",
     "ollama==0.6.1",
-    "onnxruntime==1.23.2",
+    "onnxruntime==1.19.0",
     "openai==2.16.0",
     "openapi-pydantic==0.5.1",
     "openinference-instrumentation==0.1.45",
@@ -238,5 +238,3 @@ dependencies = [
     "zipp==3.23.0",
 ]
 
-[tool.uv.sources]
-agno = { git = "https://github.com/iamikunnnnn/agno.git", subdirectory = "libs/agno", rev = "a471dba03190484fe8e0810c7318120045982f77" }
