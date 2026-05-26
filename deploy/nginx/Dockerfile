@@ -10,11 +10,12 @@ COPY agent-web-fronted/package.json agent-web-fronted/package-lock.json ./
 COPY agent-web-fronted/index.html ./
 COPY agent-web-fronted/tsconfig.json ./
 COPY agent-web-fronted/vite.config.ts ./
-COPY agent-web-fronted/.env ./.env
+COPY agent-web-fronted/.env* ./
+
 COPY agent-web-fronted/scripts ./scripts
 COPY agent-web-fronted/src ./src
 
-RUN npm ci
+RUN npm install --force --omit=optional
 RUN npm run build
 
 FROM openresty/openresty:alpine-fat
