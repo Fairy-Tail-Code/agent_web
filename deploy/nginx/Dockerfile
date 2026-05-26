@@ -6,6 +6,10 @@ RUN apt-get update \
 
 WORKDIR /build/frontend
 
+# 前端构建时需要的 Vite 环境变量（通过 build args 传入）
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+
 COPY agent-web-fronted/package.json agent-web-fronted/package-lock.json ./
 COPY agent-web-fronted/index.html ./
 COPY agent-web-fronted/tsconfig.json ./
@@ -14,6 +18,12 @@ COPY agent-web-fronted/.env* ./
 
 COPY agent-web-fronted/scripts ./scripts
 COPY agent-web-fronted/src ./src
+
+# 写入 .env 供 Vite 构建使用
+RUN if [ -n "$VITE_SUPABASE_URL" ]; then \
+      echo "VITE_SUPABASE_URL=$VITE_SUPABASE_URL" > .env && \
+      echo "VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY" >> .env; \
+    fi
 
 RUN npm install --force --platform=linux
 RUN npm run build
