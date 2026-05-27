@@ -135,7 +135,7 @@ services:
     image: zhangwei12138/agent-frontend-adapter:latest
     environment:
       NODE_ENV: production
-      SERVICE_BASE_URL: http://gateway/backend
+      SERVICE_BASE_URL: http://app:8005
       SERVICE_ADAPTER_PORT: "4000"
       SERVICE_ADAPTER_SQLITE_PATH: /data/copilotkit-runtime.sqlite
     expose:
