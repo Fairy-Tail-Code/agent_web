@@ -146,6 +146,18 @@ from api.knowledge_router import knowledge_router
 app.include_router(knowledge_router)
 log_info("已注册知识库管理路由")
 
+# Register file download router
+from api.file_router import file_router
+app.include_router(file_router)
+log_info("已注册文件下载路由")
+
+# Register login router
+from auth.login_router import router as login_router
+from auth.login_logs import ensure_login_logs_table
+app.include_router(login_router)
+ensure_login_logs_table()
+log_info("已注册登录安全路由")
+
 setup_prometheus_monitoring(
     app=app,
     agent_os=agent_os,
