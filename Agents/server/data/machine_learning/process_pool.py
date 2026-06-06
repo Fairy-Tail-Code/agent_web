@@ -1,3 +1,4 @@
+import atexit
 import os
 from concurrent.futures import Future, ProcessPoolExecutor
 from typing import Any, Dict, Optional, Sequence, Union
@@ -68,3 +69,10 @@ def shutdown_train_executor(wait: bool = True) -> None:
         _TRAIN_EXECUTOR.shutdown(wait=wait)
         _TRAIN_EXECUTOR = None
 
+
+# 注册 atexit 兜底清理，确保进程退出时进程池被正确关闭
+atexit.register(shutdown_train_executor)
+
+# fork 后重新初始化（仅 Unix 支持，Windows 没有 register_at_fork）
+if hasattr(os, "register_at_fork"):
+    os.register_at_fork(after_in_child=lambda: globals().update({"_TRAIN_EXECUTOR": None}))

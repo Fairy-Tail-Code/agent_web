@@ -72,10 +72,9 @@ MODEL_DICT_CLASSIFICATION: Dict[str, Any] = {
 
 
 def _safe_user_segment(user_id: Union[int, str]) -> str:
-    raw = str(user_id).strip()
-    if not raw:
-        return "anonymous"
-    return "".join(ch if ch.isalnum() or ch in {"-", "_"} else "_" for ch in raw)
+    """将 user_id 转为安全的目录名（委托给 DataFileManager）"""
+    from storage.file_manager import BaseFileManager
+    return BaseFileManager.safe_user_segment(str(user_id))
 
 
 def _resolve_model_root() -> Path:

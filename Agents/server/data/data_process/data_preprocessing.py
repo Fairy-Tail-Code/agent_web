@@ -78,8 +78,24 @@ def _get_db_path() -> str:
 
 def _get_data_path_by_user(user_id: Union[int, str]="test_user") -> str:
     """
-    从 SQLite 元数据库中查询指定 user_id 对应的数据文件路径。
+    从元数据查询指定 user_id 对应的数据文件路径。
+
+    优先使用 DataFileManager（storage_files 表），回退到旧版 user_data 表。
     """
+    use_unified = os.getenv("USE_UNIFIED_STORAGE", "true").lower() == "true"
+    if use_unified:
+        try:
+            from storage.file_manager import DataFileManager
+            fm = DataFileManager()
+            return fm.get_csv_path(str(user_id))
+        except FileNotFoundError:
+            # DataFileManager 未找到，尝试旧表兜底
+            pass
+        except Exception:
+            # 其他异常也兜底到旧表
+            pass
+
+    # 旧版逻辑：从 user_data 表查询
     db_path = _get_db_path()
     try:
         with sqlite3.connect(db_path) as conn:

@@ -1,4 +1,5 @@
 
+import atexit
 import os
 from concurrent.futures import Future, ThreadPoolExecutor
 from typing import Any, Callable, Optional, TypeVar
@@ -56,3 +57,10 @@ def shutdown(wait: bool = True) -> None:
         _executor.shutdown(wait=wait)
         _executor = None
 
+
+# 注册 atexit 兜底清理，确保进程退出时线程池被正确关闭
+atexit.register(shutdown)
+
+# fork 后重新初始化（仅 Unix 支持，Windows 没有 register_at_fork）
+if hasattr(os, "register_at_fork"):
+    os.register_at_fork(after_in_child=lambda: globals().update({"_executor": None}))
