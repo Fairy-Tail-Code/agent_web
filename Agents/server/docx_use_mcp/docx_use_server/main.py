@@ -1,3 +1,4 @@
+from typing import Optional
 """
 Main entry point for the Word Document MCP Server.
 Acts as the central controller for the MCP server that handles Word document operations.
@@ -103,7 +104,7 @@ def register_tools():
             destructiveHint=True,
         ),
     )
-    def create_document(filename: str, title: str = None, author: str = None):
+    def create_document(filename: str, title: Optional[str] = None, author: Optional[str] = None):
         """Create a new Word document with optional metadata."""
         return document_tools.create_document(filename, title, author)
 
@@ -113,7 +114,7 @@ def register_tools():
             destructiveHint=True,
         ),
     )
-    def copy_document(source_filename: str, destination_filename: str = None):
+    def copy_document(source_filename: str, destination_filename: Optional[str] = None):
         """Create a copy of a Word document."""
         return document_tools.copy_document(source_filename, destination_filename)
 
@@ -172,27 +173,27 @@ def register_tools():
             title="Insert Header Near Text",
         ),
     )
-    def insert_header_near_text(filename: str, target_text: str = None, header_title: str = None, position: str = 'after', header_style: str = 'Heading 1', target_paragraph_index: int = None):
+    def insert_header_near_text(filename: str, target_text: Optional[str] = None, header_title: Optional[str] = None, position: str = 'after', header_style: str = 'Heading 1', target_paragraph_index: Optional[int] = None):
         """Insert a header (with specified style) before or after the target paragraph. Specify by text or paragraph index. Args: filename (str), target_text (str, optional), header_title (str), position ('before' or 'after'), header_style (str, default 'Heading 1'), target_paragraph_index (int, optional)."""
-        return content_tools.insert_header_near_text_tool(filename, target_text, header_title, position, header_style, target_paragraph_index)
+        return content_tools.insert_header_near_text_tool(filename, target_text, header_title, position, header_style, target_paragraph_index)  # ty:ignore[invalid-argument-type]
 
     @mcp.tool(
         annotations=ToolAnnotations(
             title="Insert Line Near Text",
         ),
     )
-    def insert_line_or_paragraph_near_text(filename: str, target_text: str = None, line_text: str = None, position: str = 'after', line_style: str = None, target_paragraph_index: int = None):
+    def insert_line_or_paragraph_near_text(filename: str, target_text: Optional[str] = None, line_text: Optional[str] = None, position: str = 'after', line_style: Optional[str] = None, target_paragraph_index: Optional[int] = None):
         """
         Insert a new line or paragraph (with specified or matched style) before or after the target paragraph. Specify by text or paragraph index. Args: filename (str), target_text (str, optional), line_text (str), position ('before' or 'after'), line_style (str, optional), target_paragraph_index (int, optional).
         """
-        return content_tools.insert_line_or_paragraph_near_text_tool(filename, target_text, line_text, position, line_style, target_paragraph_index)
+        return content_tools.insert_line_or_paragraph_near_text_tool(filename, target_text, line_text, position, line_style, target_paragraph_index)  # ty:ignore[invalid-argument-type]
 
     @mcp.tool(
         annotations=ToolAnnotations(
             title="Insert List Near Text",
         ),
     )
-    def insert_numbered_list_near_text(filename: str, target_text: str = None, list_items: list[str] = None, position: str = 'after', target_paragraph_index: int = None, bullet_type: str = 'bullet'):
+    def insert_numbered_list_near_text(filename: str, target_text: Optional[str] = None, list_items: Optional[list[str]] = None, position: str = 'after', target_paragraph_index: Optional[int] = None, bullet_type: str = 'bullet'):
         """Insert a bulleted or numbered list before or after the target paragraph. Specify by text or paragraph index. Args: filename (str), target_text (str, optional), list_items (list of str), position ('before' or 'after'), target_paragraph_index (int, optional), bullet_type ('bullet' for bullets or 'number' for numbered lists, default: 'bullet')."""
         return content_tools.insert_numbered_list_near_text_tool(filename, target_text, list_items, position, target_paragraph_index, bullet_type)
     # Content tools (paragraphs, headings, tables, etc.)
@@ -201,9 +202,9 @@ def register_tools():
             title="Add Paragraph",
         ),
     )
-    def add_paragraph(filename: str, text: str, style: str = None,
-                      font_name: str = None, font_size: int = None,
-                      bold: bool = None, italic: bool = None, color: str = None):
+    def add_paragraph(filename: str, text: str, style: Optional[str] = None,
+                      font_name: Optional[str] = None, font_size: Optional[int] = None,
+                      bold: Optional[bool] = None, italic: Optional[bool] = None, color: Optional[str] = None):
         """Add a paragraph to a Word document with optional formatting.
 
         Args:
@@ -224,8 +225,8 @@ def register_tools():
         ),
     )
     def add_heading(filename: str, text: str, level: int = 1,
-                    font_name: str = None, font_size: int = None,
-                    bold: bool = None, italic: bool = None, border_bottom: bool = False):
+                    font_name: Optional[str] = None, font_size: Optional[int] = None,
+                    bold: Optional[bool] = None, italic: Optional[bool] = None, border_bottom: bool = False):
         """Add a heading to a Word document with optional formatting.
 
         Args:
@@ -245,7 +246,7 @@ def register_tools():
             title="Add Picture",
         ),
     )
-    def add_picture(filename: str, image_path: str, width: float = None):
+    def add_picture(filename: str, image_path: str, width: Optional[float] = None):
         """Add an image to a Word document."""
         return content_tools.add_picture(filename, image_path, width)
 
@@ -254,7 +255,7 @@ def register_tools():
             title="Add Table",
         ),
     )
-    def add_table(filename: str, rows: int, cols: int, data: list[list[str]] = None):
+    def add_table(filename: str, rows: int, cols: int, data: Optional[list[list[str]]] = None):
         """Add a table to a Word document."""
         return content_tools.add_table(filename, rows, cols, data)
 
@@ -293,10 +294,10 @@ def register_tools():
             title="Create Custom Style",
         ),
     )
-    def create_custom_style(filename: str, style_name: str, bold: bool = None,
-                          italic: bool = None, font_size: int = None,
-                          font_name: str = None, color: str = None,
-                          base_style: str = None):
+    def create_custom_style(filename: str, style_name: str, bold: Optional[bool] = None,
+                          italic: Optional[bool] = None, font_size: Optional[int] = None,
+                          font_name: Optional[str] = None, color: Optional[str] = None,
+                          base_style: Optional[str] = None):
         """Create a custom style in the document."""
         return format_tools.create_custom_style(
             filename, style_name, bold, italic, font_size, font_name, color, base_style
@@ -308,8 +309,8 @@ def register_tools():
         ),
     )
     def format_text(filename: str, paragraph_index: int, start_pos: int, end_pos: int,
-                   bold: bool = None, italic: bool = None, underline: bool = None,
-                   color: str = None, font_size: int = None, font_name: str = None):
+                   bold: Optional[bool] = None, italic: Optional[bool] = None, underline: Optional[bool] = None,
+                   color: Optional[str] = None, font_size: Optional[int] = None, font_name: Optional[str] = None):
         """Format a specific range of text within a paragraph."""
         return format_tools.format_text(
             filename, paragraph_index, start_pos, end_pos, bold, italic,
@@ -321,8 +322,8 @@ def register_tools():
             title="Format Table",
         ),
     )
-    def format_table(filename: str, table_index: int, has_header_row: bool = None,
-                    border_style: str = None, shading: list[str] = None):
+    def format_table(filename: str, table_index: int, has_header_row: Optional[bool] = None,
+                    border_style: Optional[str] = None, shading: Optional[list[list[str]]] = None):
         """Format a table with borders, shading, and structure."""
         return format_tools.format_table(filename, table_index, has_header_row, border_style, shading)
 
@@ -444,7 +445,7 @@ def register_tools():
         ),
     )
     def add_footnote_after_text(filename: str, search_text: str, footnote_text: str,
-                               output_filename: str = None):
+                               output_filename: Optional[str] = None):
         """Add a footnote after specific text with proper superscript formatting.
         This enhanced function ensures footnotes display correctly as superscript."""
         return footnote_tools.add_footnote_after_text(filename, search_text, footnote_text, output_filename)
@@ -455,7 +456,7 @@ def register_tools():
         ),
     )
     def add_footnote_before_text(filename: str, search_text: str, footnote_text: str,
-                                output_filename: str = None):
+                                output_filename: Optional[str] = None):
         """Add a footnote before specific text with proper superscript formatting.
         This enhanced function ensures footnotes display correctly as superscript."""
         return footnote_tools.add_footnote_before_text(filename, search_text, footnote_text, output_filename)
@@ -466,7 +467,7 @@ def register_tools():
         ),
     )
     def add_footnote_enhanced(filename: str, paragraph_index: int, footnote_text: str,
-                             output_filename: str = None):
+                             output_filename: Optional[str] = None):
         """Enhanced footnote addition with guaranteed superscript formatting.
         Adds footnote at the end of a specific paragraph with proper style handling."""
         return footnote_tools.add_footnote_enhanced(filename, paragraph_index, footnote_text, output_filename)
@@ -486,8 +487,8 @@ def register_tools():
         ),
     )
     def customize_footnote_style(filename: str, numbering_format: str = "1, 2, 3",
-                                start_number: int = 1, font_name: str = None,
-                                font_size: int = None):
+                                start_number: int = 1, font_name: Optional[str] = None,
+                                font_size: Optional[int] = None):
         """Customize footnote numbering and formatting in a Word document."""
         return footnote_tools.customize_footnote_style(
             filename, numbering_format, start_number, font_name, font_size
@@ -499,8 +500,8 @@ def register_tools():
             destructiveHint=True,
         ),
     )
-    def delete_footnote_from_document(filename: str, footnote_id: int = None,
-                                     search_text: str = None, output_filename: str = None):
+    def delete_footnote_from_document(filename: str, footnote_id: Optional[int] = None,
+                                     search_text: Optional[str] = None, output_filename: Optional[str] = None):
         """Delete a footnote from a Word document.
         Identify the footnote either by ID (1, 2, 3, etc.) or by searching for text near it."""
         return footnote_tools.delete_footnote_from_document(
@@ -513,8 +514,8 @@ def register_tools():
             title="Add Footnote Robust",
         ),
     )
-    def add_footnote_robust(filename: str, search_text: str = None,
-                           paragraph_index: int = None, footnote_text: str = "",
+    def add_footnote_robust(filename: str, search_text: Optional[str] = None,
+                           paragraph_index: Optional[int] = None, footnote_text: str = "",
                            validate_location: bool = True, auto_repair: bool = False):
         """Add footnote with robust validation and Word compliance.
         This is the production-ready version with comprehensive error handling."""
@@ -540,8 +541,8 @@ def register_tools():
             destructiveHint=True,
         ),
     )
-    def delete_footnote_robust(filename: str, footnote_id: int = None,
-                              search_text: str = None, clean_orphans: bool = True):
+    def delete_footnote_robust(filename: str, footnote_id: Optional[int] = None,
+                              search_text: Optional[str] = None, clean_orphans: bool = True):
         """Delete footnote with comprehensive cleanup and orphan removal.
         Ensures complete removal from document.xml, footnotes.xml, and relationships."""
         return footnote_tools.delete_footnote_robust_tool(
@@ -578,7 +579,7 @@ def register_tools():
             destructiveHint=True,
         ),
     )
-    def convert_to_pdf(filename: str, output_filename: str = None):
+    def convert_to_pdf(filename: str, output_filename: Optional[str] = None):
         """Convert a Word document to PDF format."""
         return extended_document_tools.convert_to_pdf(filename, output_filename)
 
@@ -587,7 +588,7 @@ def register_tools():
             title="Replace Block Below Header",
         ),
     )
-    def replace_paragraph_block_below_header(filename: str, header_text: str, new_paragraphs: list[str], detect_block_end_fn: str = None):
+    def replace_paragraph_block_below_header(filename: str, header_text: str, new_paragraphs: list[str], detect_block_end_fn: Optional[str] = None):
         """Reemplaza el bloque de párrafos debajo de un encabezado, evitando modificar TOC."""
         return replace_paragraph_block_below_header_tool(filename, header_text, new_paragraphs, detect_block_end_fn)
 
@@ -596,7 +597,7 @@ def register_tools():
             title="Replace Block Between Anchors",
         ),
     )
-    def replace_block_between_manual_anchors(filename: str, start_anchor_text: str, new_paragraphs: list[str], end_anchor_text: str = None, match_fn: str = None, new_paragraph_style: str = None):
+    def replace_block_between_manual_anchors(filename: str, start_anchor_text: str, new_paragraphs: list[str], end_anchor_text: Optional[str] = None, match_fn: Optional[str] = None, new_paragraph_style: Optional[str] = None):
         """Replace all content between start_anchor_text and end_anchor_text (or next logical header if not provided)."""
         return replace_block_between_manual_anchors_tool(filename, start_anchor_text, new_paragraphs, end_anchor_text, match_fn, new_paragraph_style)
 
@@ -677,9 +678,9 @@ def register_tools():
         ),
     )
     def format_table_cell_text(filename: str, table_index: int, row_index: int, col_index: int,
-                               text_content: str = None, bold: bool = None, italic: bool = None,
-                               underline: bool = None, color: str = None, font_size: int = None,
-                               font_name: str = None):
+                               text_content: Optional[str] = None, bold: Optional[bool] = None, italic: Optional[bool] = None,
+                               underline: Optional[bool] = None, color: Optional[str] = None, font_size: Optional[int] = None,
+                               font_name: Optional[str] = None):
         """Format text within a specific table cell."""
         return format_tools.format_table_cell_text(filename, table_index, row_index, col_index,
                                                    text_content, bold, italic, underline, color, font_size, font_name)
@@ -690,8 +691,8 @@ def register_tools():
         ),
     )
     def set_table_cell_padding(filename: str, table_index: int, row_index: int, col_index: int,
-                               top: float = None, bottom: float = None, left: float = None,
-                               right: float = None, unit: str = "points"):
+                               top: Optional[float] = None, bottom: Optional[float] = None, left: Optional[float] = None,
+                               right: Optional[float] = None, unit: str = "points"):
         """Set padding/margins for a specific table cell."""
         return format_tools.set_table_cell_padding(filename, table_index, row_index, col_index,
                                                    top, bottom, left, right, unit)

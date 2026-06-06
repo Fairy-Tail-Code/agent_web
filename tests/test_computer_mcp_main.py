@@ -15,7 +15,8 @@ if str(ROOT) not in sys.path:
 if str(AGNO_LIBS) not in sys.path:
     sys.path.insert(0, str(AGNO_LIBS))
 
-from server.computer_mcp.main import computer_mcp_app  # noqa: E402
+from Agents.server.computer_mcp.main import computer_mcp_app  # ty:ignore[unresolved-import]
+  # noqa: E402
 
 
 class ComputerMcpTests(unittest.TestCase):

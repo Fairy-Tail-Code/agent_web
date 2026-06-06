@@ -1,6 +1,5 @@
 from agno.agent import Agent
 from agno.memory import MemoryManager
-from agno.agent import Agent
 from agno.tools.duckduckgo import DuckDuckGoTools
 
 from config.db_config import create_base_db
@@ -15,7 +14,7 @@ def _process_agent_tool_entrypoints(agent: Agent):
         from agno.tools import Toolkit
         from agno.tools.function import Function
 
-        for tool in agent.tools:
+        for tool in agent.tools:  # ty:ignore[not-iterable]
             if isinstance(tool, Toolkit):
                 for _, func in tool.functions.items():
                     if func.entrypoint and not func.skip_entrypoint_processing:
@@ -39,7 +38,7 @@ def _process_agent_tool_entrypoints(agent: Agent):
 def set_default_config_to_agent(agent: Agent):
     # unified config
     if isinstance(agent, Agent):
-        agent.db = create_base_db(agent.id)
+        agent.db = create_base_db(agent.id)  # ty:ignore[invalid-argument-type]
         # 如果 model 为 None 或是框架默认的 OpenAIChat(id="gpt-4o")，替换为系统的 get_ai_model()
         if not agent.model or (type(agent.model).__name__ == "OpenAIChat" and agent.model.id == "gpt-4o"):
             agent.model = get_ai_model()
@@ -52,7 +51,7 @@ def set_default_config_to_agent(agent: Agent):
         # Agents should use knowledge query tools instead.
 
         # not default config
-        agent.stream_intermediate_steps = True
+        agent.stream_intermediate_steps = True  # ty:ignore[unresolved-attribute]
         # agent.read_chat_history = True
         agent.add_history_to_context = True
         # 似乎开启这个以后，用户每轮消息都会被写入记忆。
@@ -72,7 +71,7 @@ def set_default_config_to_agent(agent: Agent):
         _process_agent_tool_entrypoints(agent)
 
         # 批量添加工具
-        agent.tools.extend([DuckDuckGoTools(),])
+        agent.tools.extend([DuckDuckGoTools(),])  # ty:ignore[unresolved-attribute]
 
         # ── 统一追加文件下载提示到 system_message ──
         _file_download_hint = (
@@ -85,8 +84,8 @@ def set_default_config_to_agent(agent: Agent):
             "可以给出多个文件链接。"
         )
         if hasattr(agent, "system_message") and agent.system_message:
-            agent.system_message += _file_download_hint
+            agent.system_message += _file_download_hint  # ty:ignore[unsupported-operator]
         elif hasattr(agent, "instructions") and agent.instructions:
-            agent.instructions += _file_download_hint
+            agent.instructions += _file_download_hint  # ty:ignore[unsupported-operator]
     else:
         return agent

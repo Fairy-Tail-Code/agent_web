@@ -15,10 +15,10 @@ if str(ROOT) not in sys.path:
 class MainEntrypointTests(unittest.TestCase):
     def test_main_can_run_without_windows_event_loop_policy(self) -> None:
         fake_asyncio = types.ModuleType("asyncio")
-        fake_asyncio.set_event_loop_policy = Mock()
+        fake_asyncio.set_event_loop_policy = Mock()  # ty:ignore[unresolved-attribute]
 
         fake_uvicorn = types.ModuleType("uvicorn")
-        fake_uvicorn.run = Mock()
+        fake_uvicorn.run = Mock()  # ty:ignore[unresolved-attribute]
 
         fake_agno = types.ModuleType("agno")
 

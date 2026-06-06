@@ -30,7 +30,7 @@ from auth.kb_metadata import (
 )
 from config.db_config import create_knowledge_vector, create_knowledge
 
-from knowledge.knowledge import (
+from Agents.knowledge.knowledge import (
     KnowledgeBaseCreate,
     KnowledgeBaseUpdate,
     KnowledgeBaseResponse,
@@ -241,7 +241,7 @@ async def update_user_knowledge_base(
         raise HTTPException(status_code=400, detail="No fields to update")
 
     # Update in database
-    updated_kb = update_knowledge_base(kb_id, **update_data)
+    updated_kb = update_knowledge_base(kb_id, **update_data)  # ty:ignore[invalid-argument-type]
     if not updated_kb:
         raise HTTPException(status_code=500, detail="Failed to update knowledge base")
 
@@ -326,7 +326,7 @@ async def upload_file_to_knowledge_base(
 
     # Validate file type
     allowed_extensions = {'.pdf', '.doc', '.docx', '.txt', '.md', '.html', '.htm', '.csv'}
-    file_ext = Path(file.filename).suffix.lower()
+    file_ext = Path(file.filename or "").suffix.lower()
     if file_ext not in allowed_extensions:
         raise HTTPException(status_code=400, detail=f"Unsupported file type: {file_ext}")
 
@@ -356,7 +356,7 @@ async def upload_file_to_knowledge_base(
     file_record = create_file_record(
         file_id=file_id,
         kb_id=kb_id,
-        file_name=file.filename,
+        file_name=file.filename or "",
         file_path=file_url,  # Store URL instead of local path
         file_size=file_size,
         file_type=file_ext[1:],  # Remove the dot
@@ -366,7 +366,7 @@ async def upload_file_to_knowledge_base(
     update_kb_file_count(kb_id, increment=1)
 
     # Queue file for processing
-    from knowledge.processor import queue_file_for_processing
+    from Agents.knowledge.processor import queue_file_for_processing
     await queue_file_for_processing(file_id, kb_id)
 
     return FileUploadResponse(
@@ -488,7 +488,7 @@ async def delete_file(
     try:
         storage = get_qiniu_storage()
         storage.delete_file(file_record.file_path)
-    except Exception as e:
+    except Exception:
         # Log error but continue
         pass
 
@@ -541,10 +541,10 @@ async def search_knowledge_base(
 
         return [
             SearchResult(
-                content=result.data.get("content", ""),
-                metadata=result.meta or {},
-                score=result.score or 0.0,
-                source_file=result.data.get("source", ""),
+                content=result.data.get("content", ""),  # ty:ignore[unresolved-attribute]
+                metadata=result.meta or {},  # ty:ignore[unresolved-attribute]
+                score=result.score or 0.0,  # ty:ignore[unresolved-attribute]
+                source_file=result.data.get("source", ""),  # ty:ignore[unresolved-attribute]
             )
             for result in results
         ]

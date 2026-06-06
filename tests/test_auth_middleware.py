@@ -1,4 +1,4 @@
-import pytest
+import pytest  # ty:ignore[unresolved-import]
 from starlette.testclient import TestClient
 from fastapi import FastAPI, Request
 from auth.middleware import AuthMiddleware

@@ -7,7 +7,7 @@ import os
 import zipfile
 from typing import Any, Dict, Optional, Tuple
 
-from lxml import etree
+from lxml import etree  # ty:ignore[unresolved-import]
 
 # Namespace definitions
 W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
@@ -354,7 +354,7 @@ def add_footnote_robust(
         else:
             # Use paragraph index
             paragraphs = doc_root.xpath('//w:p', namespaces=nsmap)
-            if paragraph_index >= len(paragraphs):
+            if paragraph_index is not None and paragraph_index >= len(paragraphs):
                 return False, f"Paragraph index {paragraph_index} out of range", None
             target_para = paragraphs[paragraph_index]
 

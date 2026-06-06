@@ -7,13 +7,15 @@ Agent 生成文件保存在 /app/user_cache/ 下，此路由提供：
 from __future__ import annotations
 
 import os
+import sqlite3
 import stat
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+from agno.utils.log import logger as _logger
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel
 
 from auth.model import CurrentUser
@@ -102,6 +104,64 @@ def _file_to_info(path: Path, rel_path: str) -> FileInfo:
     )
 
 
+# ── OSS 兜底下载 ─────────────────────────────────────────────
+
+# 路径前缀 → storage 模块名映射
+_MODULE_MAP = {"office": "office", "workspace": "data", "data": "data", "knowledge": "knowledge"}
+
+
+def _infer_module(file_path: str) -> Optional[str]:
+    """从文件下载路径前缀推断 storage 模块名。"""
+    parts = Path(file_path).parts
+    return _MODULE_MAP.get(parts[0]) if parts else None
+
+
+def _query_oss_url(user_id: str, filename: str, module: Optional[str] = None) -> Optional[str]:
+    """从 storage_files 表查询已同步文件的 OSS URL。
+
+    Returns:
+        oss_url 字符串，或 None（未找到 / OSS 未启用）。
+    """
+    try:
+        from storage import is_oss_enabled
+
+        if not is_oss_enabled():
+            return None
+    except ImportError:
+        return None
+
+    db_path = os.getenv("DATA_DB_PATH")
+    if not db_path:
+        return None
+
+    try:
+        conn = sqlite3.connect(db_path)
+        try:
+            cursor = conn.cursor()
+            if module:
+                cursor.execute(
+                    "SELECT oss_url FROM storage_files "
+                    "WHERE user_id = ? AND filename = ? AND module = ? "
+                    "AND status = 'synced' AND oss_url IS NOT NULL "
+                    "ORDER BY created_at DESC LIMIT 1",
+                    (user_id, filename, module),
+                )
+            else:
+                cursor.execute(
+                    "SELECT oss_url FROM storage_files "
+                    "WHERE user_id = ? AND filename = ? "
+                    "AND status = 'synced' AND oss_url IS NOT NULL "
+                    "ORDER BY created_at DESC LIMIT 1",
+                    (user_id, filename),
+                )
+            row = cursor.fetchone()
+            return row[0] if row else None
+        finally:
+            conn.close()
+    except Exception:
+        return None
+
+
 # ── 路由 ──────────────────────────────────────────────────────
 @file_router.get("/list", response_model=FileListResponse)
 async def list_files(
@@ -149,7 +209,7 @@ async def download_file(
     file_path: str,
     current_user: CurrentUser = Depends(get_current_user),
 ):
-    """下载指定文件。
+    """下载指定文件。本地文件优先，不存在时自动回退到 OSS 签名 URL。
 
     file_path 为相对于 FILE_SERVE_ROOT 的路径，
     例如 "office/output/docx/xxx.docx"。
@@ -159,17 +219,34 @@ async def download_file(
     # 安全检查
     if not _path_in_allowed_subdir(resolved):
         raise HTTPException(status_code=403, detail="目录不在允许范围")
-    if not resolved.is_file():
-        raise HTTPException(status_code=404, detail="文件不存在")
     if not _is_allowed_file(resolved):
         raise HTTPException(status_code=403, detail="不支持的文件类型")
 
-    st = resolved.stat()
-    if st.st_size > MAX_FILE_SIZE:
-        raise HTTPException(status_code=413, detail="文件过大")
+    # ── 优先从本地磁盘返回 ──
+    if resolved.is_file():
+        st = resolved.stat()
+        if st.st_size > MAX_FILE_SIZE:
+            raise HTTPException(status_code=413, detail="文件过大")
+        return FileResponse(
+            path=str(resolved),
+            filename=resolved.name,
+            media_type="application/octet-stream",
+        )
 
-    return FileResponse(
-        path=str(resolved),
-        filename=resolved.name,
-        media_type="application/octet-stream",
-    )
+    # ── 本地文件不存在，尝试 OSS 签名 URL 兜底 ──
+    filename = Path(file_path).name
+    module = _infer_module(file_path)
+    oss_url = _query_oss_url(current_user.user_id, filename, module)
+
+    if oss_url:
+        try:
+            from storage import get_qiniu_storage
+
+            storage = get_qiniu_storage()
+            signed_url = storage.get_download_url(oss_url)
+            _logger.info(f"文件下载重定向到 OSS: {filename}")
+            return RedirectResponse(url=signed_url)
+        except Exception as exc:
+            _logger.warning(f"OSS 签名 URL 生成失败: {exc}")
+
+    raise HTTPException(status_code=404, detail="文件不存在")

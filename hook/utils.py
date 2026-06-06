@@ -2,7 +2,7 @@ import mimetypes
 import os
 from pathlib import Path
 
-from markitdown import MarkItDown
+from markitdown import MarkItDown  # ty:ignore[unresolved-import]
 
 WORKSPACE_ROOT = Path(os.getenv("DATA_UPLOAD_DIR", "./user_cache/workspace"))
 mimetypes.add_type("text/md", ".md")

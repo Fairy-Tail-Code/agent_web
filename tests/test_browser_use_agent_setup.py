@@ -37,12 +37,12 @@ class BrowserUseAgentSetupTests(unittest.TestCase):
         def fake_clear_browser_transient_state(**kwargs) -> None:  # noqa: ANN003
             return None
 
-        fake_agno_agent.Agent = FakeAgent
-        fake_agno_skills.LocalSkills = FakeLocalSkills
-        fake_agno_skills.Skills = FakeSkills
-        fake_browser_tool_module.browser_use_tool = object()
-        fake_wdm_toolkit_module.webDriverMonitorToolkit = FakeToolkit
-        fake_wdm_toolkit_module.clear_browser_transient_state = fake_clear_browser_transient_state
+        fake_agno_agent.Agent = FakeAgent  # ty:ignore[unresolved-attribute]
+        fake_agno_skills.LocalSkills = FakeLocalSkills  # ty:ignore[unresolved-attribute]
+        fake_agno_skills.Skills = FakeSkills  # ty:ignore[unresolved-attribute]
+        fake_browser_tool_module.browser_use_tool = object()  # ty:ignore[unresolved-attribute]
+        fake_wdm_toolkit_module.webDriverMonitorToolkit = FakeToolkit  # ty:ignore[unresolved-attribute]
+        fake_wdm_toolkit_module.clear_browser_transient_state = fake_clear_browser_transient_state  # ty:ignore[unresolved-attribute]
 
         with patch.dict(
             sys.modules,
@@ -55,7 +55,8 @@ class BrowserUseAgentSetupTests(unittest.TestCase):
             clear=False,
         ):
             sys.modules.pop("agent.browser_use_agent", None)
-            from agent.browser_use_agent import create_browser_use_agent
+            from Agents.agent.browser_use_agent import create_browser_use_agent  # ty:ignore[unresolved-import]
+
 
         agent = create_browser_use_agent("browser_use_agent")
 
@@ -73,7 +74,7 @@ class BrowserUseAgentSetupTests(unittest.TestCase):
             def __init__(self, agent_id: str) -> None:
                 self.id = agent_id
 
-        fake_agno_agent.Agent = FakeAgent
+        fake_agno_agent.Agent = FakeAgent  # ty:ignore[unresolved-attribute]
 
         def _fake_factory(agent_id: str) -> FakeAgent:
             return FakeAgent(agent_id)
@@ -84,10 +85,10 @@ class BrowserUseAgentSetupTests(unittest.TestCase):
             return mod
 
         fake_utils = types.ModuleType("api.utils")
-        fake_utils.set_default_config_to_agent = Mock()
+        fake_utils.set_default_config_to_agent = Mock()  # ty:ignore[unresolved-attribute]
 
         fake_read_agent = types.ModuleType("agent_manage.read_agent")
-        fake_read_agent.read_agent = Mock(return_value=[])
+        fake_read_agent.read_agent = Mock(return_value=[])  # ty:ignore[unresolved-attribute]
 
         with patch.dict(
             sys.modules,
@@ -112,7 +113,7 @@ class BrowserUseAgentSetupTests(unittest.TestCase):
 
     def test_init_workflow_no_longer_registers_browser_use_workflow(self) -> None:
         fake_workflow_module = types.ModuleType("workflow.browser_workflow")
-        fake_workflow_module.create_browser_workflow = Mock(return_value=object())
+        fake_workflow_module.create_browser_workflow = Mock(return_value=object())  # ty:ignore[unresolved-attribute]
 
         with patch.dict(sys.modules, {"workflow.browser_workflow": fake_workflow_module}, clear=False):
             sys.modules.pop("api.init_workflow", None)

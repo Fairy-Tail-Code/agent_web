@@ -1,6 +1,6 @@
 from agno.team import Team
 
-from team.office_team import create_office_team
+from Agents.team.office_team import create_office_team
 
 office_team = create_office_team(team_id="office_team")
 
@@ -24,4 +24,4 @@ _file_download_hint = (
 )
 for team in all_teams:
     if hasattr(team, "instructions") and team.instructions:
-        team.instructions += _file_download_hint
+        team.instructions += _file_download_hint  # ty:ignore[unsupported-operator]

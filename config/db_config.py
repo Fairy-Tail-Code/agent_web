@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from agno.db.postgres import PostgresDb
@@ -99,7 +100,7 @@ def create_knowledge_vector(id: str, **kwargs) -> VectorDb:
 
     if Config.VECTOR_DB_TYPE.lower() == "lightrag":
         from agno.vectordb.lightrag import LightRag
-        return LightRag(server_url=os.getenv("LIGHTRAG_SERVER_URL"), **kwargs)
+        return LightRag(server_url=os.getenv("LIGHTRAG_SERVER_URL", ""), **kwargs)
     else:
         # 默认使用PgVector
         from agno.knowledge.reranker.cohere import CohereReranker
@@ -221,7 +222,7 @@ def create_tracing_db(id: str = "tracing") -> PostgresDb:
     return db_instance
 
 
-def get_db_url(id: str = None) -> str:
+def get_db_url(id: Optional[str] = None) -> str:
     """
     生成数据库连接URL，包含application_name参数
 

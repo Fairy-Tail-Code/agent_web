@@ -41,16 +41,17 @@ class _FakeResponse:
         return self._json_data
 
 
-agno_tools_pkg.Toolkit = _FakeToolkit
-agno_tools_function_pkg.ToolResult = _FakeToolResult
-httpx_pkg.get = lambda *args, **kwargs: None
+agno_tools_pkg.Toolkit = _FakeToolkit  # ty:ignore[unresolved-attribute]
+agno_tools_function_pkg.ToolResult = _FakeToolResult  # ty:ignore[unresolved-attribute]
+httpx_pkg.get = lambda *args, **kwargs: None  # ty:ignore[unresolved-attribute]
 
 sys.modules.setdefault("agno", agno_pkg)
 sys.modules.setdefault("agno.tools", agno_tools_pkg)
 sys.modules.setdefault("agno.tools.function", agno_tools_function_pkg)
 sys.modules.setdefault("httpx", httpx_pkg)
 
-from tools.academic_search_toolkit import AcademicSearchToolkit
+from Agents.tools.academic_search_toolkit import AcademicSearchToolkit  # ty:ignore[unresolved-import]
+
 
 ARXIV_XML = """<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"

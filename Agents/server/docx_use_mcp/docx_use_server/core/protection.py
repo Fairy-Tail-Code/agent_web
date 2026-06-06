@@ -31,7 +31,7 @@ def add_protection_info(doc_path: str, protection_type: str, password_hash: str,
     metadata_path = f"{base_path}.protection"
 
     # Prepare protection data
-    protection_data = {
+    protection_data: dict[str, object] = {
         "type": protection_type,
         "password_hash": password_hash,
         "applied_date": datetime.datetime.now().isoformat(),

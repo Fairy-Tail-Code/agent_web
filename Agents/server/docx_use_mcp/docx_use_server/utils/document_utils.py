@@ -1,7 +1,7 @@
 """
 Document utility functions for Word Document Server.
 """
-from typing import Any, Dict
+from typing import Any, Dict, Optional, List
 
 from docx import Document
 from docx.oxml import OxmlElement
@@ -190,7 +190,7 @@ def get_document_xml(doc_path: str) -> str:
         return f"Failed to extract XML: {str(e)}"
 
 
-def insert_header_near_text(doc_path: str, target_text: str = None, header_title: str = "", position: str = 'after', header_style: str = 'Heading 1', target_paragraph_index: int = None) -> str:
+def insert_header_near_text(doc_path: str, target_text: Optional[str] = None, header_title: str = "", position: str = 'after', header_style: str = 'Heading 1', target_paragraph_index: Optional[int] = None) -> str:
     """Insert a header (with specified style) before or after the target paragraph. Specify by text or paragraph index. Skips TOC paragraphs in text search."""
     import os
 
@@ -240,7 +240,7 @@ def insert_header_near_text(doc_path: str, target_text: str = None, header_title
         return f"Failed to insert header: {str(e)}"
 
 
-def insert_line_or_paragraph_near_text(doc_path: str, target_text: str = None, line_text: str = "", position: str = 'after', line_style: str = None, target_paragraph_index: int = None) -> str:
+def insert_line_or_paragraph_near_text(doc_path: str, target_text: Optional[str] = None, line_text: str = "", position: str = 'after', line_style: Optional[str] = None, target_paragraph_index: Optional[int] = None) -> str:
     """
     Insert a new line or paragraph (with specified or matched style) before or after the target paragraph.
     You can specify the target by text (first match) or by paragraph index.
@@ -335,7 +335,7 @@ def add_bullet_numbering(paragraph, num_id=1, level=0):
     return paragraph
 
 
-def insert_numbered_list_near_text(doc_path: str, target_text: str = None, list_items: list = None, position: str = 'after', target_paragraph_index: int = None, bullet_type: str = 'bullet') -> str:
+def insert_numbered_list_near_text(doc_path: str, target_text: Optional[str] = None, list_items: Optional[list] = None, position: str = 'after', target_paragraph_index: Optional[int] = None, bullet_type: str = 'bullet') -> str:
     """
     Insert a bulleted or numbered list before or after the target paragraph. Specify by text or paragraph index. Skips TOC paragraphs in text search.
     Args:
@@ -455,7 +455,7 @@ def delete_block_under_header(doc, header_text):
             header_idx = i
             break
 
-    if header_para is None:
+    if header_para is None or header_idx is None:
         return None, 0
 
     # Find the next heading/TOC paragraph to determine the end of the block
@@ -487,7 +487,7 @@ def replace_paragraph_block_below_header(
     header_text: str,
     new_paragraphs: list,
     detect_block_end_fn=None,
-    new_paragraph_style: str = None
+    new_paragraph_style: Optional[str] = None
 ) -> str:
     """
     Reemplaza todo el contenido debajo de una cabecera (por texto), hasta el siguiente encabezado/TOC (por estilo).
@@ -535,9 +535,9 @@ def replace_block_between_manual_anchors(
     doc_path: str,
     start_anchor_text: str,
     new_paragraphs: list,
-    end_anchor_text: str = None,
+    end_anchor_text: Optional[str] = None,
     match_fn=None,
-    new_paragraph_style: str = None
+    new_paragraph_style: Optional[str] = None
 ) -> str:
     """
     Replace all content (paragraphs, tables, etc.) between start_anchor_text and end_anchor_text (or next logical header if not provided).

@@ -185,7 +185,7 @@ class FileProcessor:
 
             # Use FileDetector to automatically select reader and chunker based on file type
             # This ensures optimal processing for each file type without user selection
-            from knowledge.file_detector import get_reader_and_chunker
+            from Agents.knowledge.file_detector import get_reader_and_chunker
             reader, chunker = get_reader_and_chunker(
                 file_path,
                 chunk_size=kb.chunk_size,
@@ -229,8 +229,8 @@ class FileProcessor:
 
             with psycopg.connect(get_psycopg_db_url(id="knowledge-processor")) as conn:
                 with conn.cursor() as cur:
-                    cur.execute(f"SELECT COUNT(*) FROM {Config.DB_NAME}.{vector_table_name}")
-                    count = cur.fetchone()[0]
+                    cur.execute(f"SELECT COUNT(*) FROM {Config.DB_NAME}.{vector_table_name}")  # ty:ignore[no-matching-overload]
+                    count = cur.fetchone()[0]  # ty:ignore[not-subscriptable]
                     return count
         except Exception as e:
             logger.error(f"Failed to count chunks in {vector_table_name}: {e}")
@@ -238,7 +238,7 @@ class FileProcessor:
 
 
 # Global file processor instance
-_file_processor: FileProcessor = None
+_file_processor: Optional[FileProcessor] = None
 
 
 def get_file_processor() -> FileProcessor:

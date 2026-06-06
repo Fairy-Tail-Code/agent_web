@@ -4,8 +4,8 @@ from agno.agent import Agent
 
 from config.db_config import create_base_db
 from config.model_config import get_ai_model
-from tools.office_search_toolkit import OfficeSearchToolkit
-from tools.knowledge_query_tool import create_knowledge_query_tool, create_knowledge_list_tool
+from Agents.tools.office_search_toolkit import OfficeSearchToolkit
+from Agents.tools.knowledge_query_tool import create_knowledge_query_tool, create_knowledge_list_tool
 
 OFFICE_SEARCH_SYSTEM_MESSAGE = """
 你是搜索专家Agent，是办公团队中的情报收集成员。

@@ -38,7 +38,7 @@ try:
 except ImportError:
     AGENTIC_CHUNKER_AVAILABLE = False
 
-from knowledge.file_detector import (
+from Agents.knowledge.file_detector import (
     get_chunker_for_file,
 )
 
@@ -114,7 +114,7 @@ class Chunk:
             from config.model_config import get_ai_model
             embedder = self.kwargs.get("embedder") or get_ai_model()
             return SemanticChunking(
-                embedder=embedder,
+                embedder=embedder,  # ty:ignore[invalid-argument-type]
                 chunk_size=self.chunk_size,
                 similarity_threshold=self.kwargs.get("similarity_threshold", 0.5),
             )

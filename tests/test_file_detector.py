@@ -3,7 +3,7 @@ Tests for file detector functionality.
 """
 
 
-from knowledge.file_detector import (
+from Agents.knowledge.file_detector import (
     FileDetector,
     FileType,
     detect_file_type,

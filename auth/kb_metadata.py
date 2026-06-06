@@ -334,7 +334,7 @@ def list_files_by_kb(
 ) -> List[KnowledgeFileRecord]:
     """List files in a knowledge base."""
     conditions = ["kb_id = %s"]
-    params = [kb_id]
+    params: list = [kb_id]
 
     if status is not None:
         conditions.append("processing_status = %s")
@@ -365,7 +365,7 @@ def update_file_status(
 ) -> Optional[KnowledgeFileRecord]:
     """Update file processing status."""
     update_fields = ["processing_status = %s"]
-    params = [status]
+    params: list = [status]
 
     if chunk_count is not None:
         update_fields.append("chunk_count = %s")

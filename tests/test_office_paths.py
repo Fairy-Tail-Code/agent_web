@@ -25,7 +25,7 @@ class OfficePathsTests(unittest.TestCase):
                 self.tools = list(tools or [])
                 self.kwargs = kwargs
 
-        toolkit_base_module.Toolkit = FakeToolkit
+        toolkit_base_module.Toolkit = FakeToolkit  # ty:ignore[unresolved-attribute]
 
         function_module = types.ModuleType("agno.tools.function")
 
@@ -33,13 +33,13 @@ class OfficePathsTests(unittest.TestCase):
             def __init__(self, content: str) -> None:
                 self.content = content
 
-        function_module.ToolResult = ToolResult
+        function_module.ToolResult = ToolResult  # ty:ignore[unresolved-attribute]
 
         run_module = types.ModuleType("agno.run")
-        run_module.RunContext = object
+        run_module.RunContext = object  # ty:ignore[unresolved-attribute]
 
         dotenv_module = types.ModuleType("dotenv")
-        dotenv_module.load_dotenv = Mock()
+        dotenv_module.load_dotenv = Mock()  # ty:ignore[unresolved-attribute]
 
         tmp = ROOT / "tmp" / "test_office_paths_markdown"
         shutil.rmtree(tmp, ignore_errors=True)
@@ -79,7 +79,7 @@ class OfficePathsTests(unittest.TestCase):
                 self.name = name
                 self.tools = list(tools or [])
 
-        toolkit_base_module.Toolkit = FakeToolkit
+        toolkit_base_module.Toolkit = FakeToolkit  # ty:ignore[unresolved-attribute]
 
         function_module = types.ModuleType("agno.tools.function")
 
@@ -87,10 +87,10 @@ class OfficePathsTests(unittest.TestCase):
             def __init__(self, content: str) -> None:
                 self.content = content
 
-        function_module.ToolResult = ToolResult
+        function_module.ToolResult = ToolResult  # ty:ignore[unresolved-attribute]
 
         dotenv_module = types.ModuleType("dotenv")
-        dotenv_module.load_dotenv = Mock()
+        dotenv_module.load_dotenv = Mock()  # ty:ignore[unresolved-attribute]
 
         tmp = ROOT / "tmp" / "test_office_paths_file_toolkit"
         shutil.rmtree(tmp, ignore_errors=True)

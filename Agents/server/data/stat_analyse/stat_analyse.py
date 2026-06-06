@@ -2,17 +2,18 @@
 from itertools import combinations
 
 import pandas as pd
-import statsmodels.api as sm
+import statsmodels.api as sm  # ty:ignore[unresolved-import]
 from scipy import stats
 from scipy.stats import levene, shapiro
 from sklearn.linear_model import LinearRegression
-from statsmodels.stats.diagnostic import het_breuschpagan
-from statsmodels.stats.outliers_influence import variance_inflation_factor
+from statsmodels.stats.diagnostic import het_breuschpagan  # ty:ignore[unresolved-import]
+from statsmodels.stats.outliers_influence import variance_inflation_factor  # ty:ignore[unresolved-import]
 
 
 class EnhancedDataAnalyzer:
     def __init__(self, data):
         self.data = data
+        self.numeric_cols: list = []
 
     def get_basic_info(self):
         """
@@ -24,6 +25,7 @@ class EnhancedDataAnalyzer:
 
         # 筛选数值型列
         numeric_cols = self.data.select_dtypes(include=['number']).columns.tolist()
+        self.numeric_cols = numeric_cols
 
         # 1. 多重共线性检验 (VIF)
         multicollinearity_info = self._check_multicollinearity(numeric_cols)
@@ -399,7 +401,7 @@ class EnhancedDataAnalyzer:
                 try:
                     if len(col_data) >= 3:
                         stat, p_value = stats.shapiro(col_data) if len(col_data) <= 5000 else (None, None)
-                        if stat is not None:
+                        if stat is not None and p_value is not None:
                             col_stats["normality"] = {
                                 "statistic": round(stat, 4),
                                 "p_value": round(p_value, 4),

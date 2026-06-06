@@ -276,7 +276,7 @@ def _create_docling_reader():
 
 
 # File type to reader factory mapping
-READER_FACTORY_MAP: Dict[FileType, Callable] = {  # type: ignore
+READER_FACTORY_MAP: Dict[FileType, Callable] = {
     FileType.PDF: _create_pdf_reader,
     FileType.CSV: _create_csv_reader,
     FileType.EXCEL: _create_excel_reader,
@@ -314,7 +314,7 @@ def _create_semantic_chunker(chunk_size: int = 5000, overlap: int = 200, **kwarg
     from config.model_config import get_ai_model
     embedder = kwargs.get("embedder") or get_ai_model()
     return SemanticChunking(
-        embedder=embedder,
+        embedder=embedder,  # ty:ignore[invalid-argument-type]
         chunk_size=chunk_size,
         similarity_threshold=kwargs.get("similarity_threshold", 0.5),
     )
@@ -369,7 +369,7 @@ def _create_agentic_chunker(chunk_size: int = 5000, overlap: int = 0, **kwargs) 
 
 
 # File type to recommended chunker mapping (hardcoded, user cannot change)
-RECOMMENDED_CHUNKER_MAP: Dict[FileType, Tuple[Callable, ChunkingStrategyType]] = {  # type: ignore
+RECOMMENDED_CHUNKER_MAP: Dict[FileType, Tuple[Callable, ChunkingStrategyType]] = {
     FileType.PDF: (_create_document_chunker, ChunkingStrategyType.DOCUMENT_CHUNKER),
     FileType.CSV: (_create_row_chunker, ChunkingStrategyType.ROW_CHUNKER),
     FileType.EXCEL: (_create_row_chunker, ChunkingStrategyType.ROW_CHUNKER),

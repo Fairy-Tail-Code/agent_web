@@ -2,10 +2,10 @@
 Tests for knowledge base multi-user isolation.
 """
 
-import pytest
+import pytest  # ty:ignore[unresolved-import]
 import uuid
 
-from auth.knowledge_db import (
+from auth.kb_metadata import (
     create_knowledge_base,
     get_knowledge_base,
     list_knowledge_bases,
@@ -209,7 +209,7 @@ class TestKnowledgeBaseModificationIsolation:
     def test_user_b_cannot_update_user_a_private_kb(self, user_a_private_kb):
         """Test that user B cannot update user A's private KB."""
         # Try to update with a different owner_id (simulating user B)
-        from auth.knowledge_db import update_knowledge_base
+        from auth.kb_metadata import update_knowledge_base
 
         # The update function doesn't check ownership directly,
         # but the API layer should enforce it.
@@ -223,7 +223,7 @@ class TestKnowledgeBaseModificationIsolation:
 
         # Database layer allows it (API should prevent)
         assert updated is not None
-        assert updated.kb_name == "Hacked by user B"
+        assert updated.kb_name == "Hacked by user B"  
 
         # Reset
         update_knowledge_base(user_a_private_kb, kb_name="User A Private KB")
@@ -236,7 +236,7 @@ class TestKnowledgeBaseModificationIsolation:
 
         kb = get_knowledge_base(user_a_private_kb)
         assert kb is not None
-        assert kb.kb_name == "User A Private KB"
+        assert kb.kb_name == "User A Private KB"  
 
 
 class TestFileAccessIsolation:
@@ -259,13 +259,13 @@ class TestFileAccessIsolation:
         yield file_id
 
         # Cleanup
-        from auth.knowledge_db import delete_file as db_delete_file
+        from auth.kb_metadata import delete_file as db_delete_file
         db_delete_file(file_id)
 
     def test_file_in_private_kb_only_visible_to_owner(self, file_in_user_a_kb, user_a, user_b):
         """Test that files in private KBs are only visible to the owner."""
         # List files for user A (should see the file)
-        from auth.knowledge_db import list_files_by_kb
+        from auth.kb_metadata import list_files_by_kb
 
         files = list_files_by_kb(user_a_private_kb)
         assert any(f.file_id == file_in_user_a_kb for f in files)
@@ -300,7 +300,7 @@ class TestPublicKnowledgeBaseBehavior:
 
     def test_public_kb_cannot_be_modified_by_others(self, user_a_public_kb, user_b):
         """Test that users cannot modify others' public KBs."""
-        from auth.knowledge_db import update_knowledge_base
+        from auth.kb_metadata import update_knowledge_base
 
         # User B tries to update user A's public KB
         # At the database level, this would succeed
@@ -308,14 +308,14 @@ class TestPublicKnowledgeBaseBehavior:
 
         # Verify current state
         kb = get_knowledge_base(user_a_public_kb)
-        original_name = kb.kb_name
+        original_name = kb.kb_name  # ty:ignore[unresolved-attribute]
 
         # Update (would succeed at DB level)
         update_knowledge_base(user_a_public_kb, kb_name="Hacked name")
 
         # Verify it changed
         kb = get_knowledge_base(user_a_public_kb)
-        assert kb.kb_name == "Hacked name"
+        assert kb.kb_name == "Hacked name"  # ty:ignore[unresolved-attribute]
 
         # Reset
         update_knowledge_base(user_a_public_kb, kb_name=original_name)
@@ -345,9 +345,9 @@ class TestOfficialKnowledgeBaseBehavior:
     def test_official_kb_system_owner(self, official_kb):
         """Test that official KBs have 'system' as owner."""
         kb = get_knowledge_base(official_kb)
-        assert kb.owner_id == "system"
-        assert kb.is_official is True
-        assert kb.is_public is True
+        assert kb.owner_id == "system"  # ty:ignore[unresolved-attribute]
+        assert kb.is_official is True  # ty:ignore[unresolved-attribute]
+        assert kb.is_public is True  # ty:ignore[unresolved-attribute]
 
 
 class TestListKnowledgeBasesFilters:

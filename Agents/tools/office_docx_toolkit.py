@@ -1,3 +1,4 @@
+from typing import Optional
 """
 Word 文档本地工具包
 
@@ -126,7 +127,7 @@ class OfficeDocxToolkit(Toolkit):
 
     # === Document tools ===
 
-    def create_document(self, filename: str, title: str = None, author: str = None) -> ToolResult:
+    def create_document(self, filename: str, title: Optional[str] = None, author: Optional[str] = None) -> ToolResult:
         """Create a new Word document with optional metadata."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.document_tools",
@@ -134,7 +135,7 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def copy_document(self, source_filename: str, destination_filename: str = None) -> ToolResult:
+    def copy_document(self, source_filename: str, destination_filename: Optional[str] = None) -> ToolResult:
         """Create a copy of a Word document."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.document_tools",
@@ -185,8 +186,8 @@ class OfficeDocxToolkit(Toolkit):
     # === Content tools ===
 
     def add_heading(self, filename: str, text: str, level: int = 1,
-                    font_name: str = None, font_size: int = None,
-                    bold: bool = None, italic: bool = None, border_bottom: bool = False) -> ToolResult:
+                    font_name: Optional[str] = None, font_size: Optional[int] = None,
+                    bold: Optional[bool] = None, italic: Optional[bool] = None, border_bottom: bool = False) -> ToolResult:
         """Add a heading to a Word document with optional formatting."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.content_tools",
@@ -194,9 +195,9 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def add_paragraph(self, filename: str, text: str, style: str = None,
-                      font_name: str = None, font_size: int = None,
-                      bold: bool = None, italic: bool = None, color: str = None) -> ToolResult:
+    def add_paragraph(self, filename: str, text: str, style: Optional[str] = None,
+                      font_name: Optional[str] = None, font_size: Optional[int] = None,
+                      bold: Optional[bool] = None, italic: Optional[bool] = None, color: Optional[str] = None) -> ToolResult:
         """Add a paragraph to a Word document with optional formatting."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.content_tools",
@@ -204,7 +205,7 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def add_table(self, filename: str, rows: int, cols: int, data: list = None) -> ToolResult:
+    def add_table(self, filename: str, rows: int, cols: int, data: Optional[list] = None) -> ToolResult:
         """Add a table to a Word document."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.content_tools",
@@ -212,7 +213,7 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def add_picture(self, filename: str, image_path: str, width: float = None) -> ToolResult:
+    def add_picture(self, filename: str, image_path: str, width: Optional[float] = None) -> ToolResult:
         """Add an image to a Word document."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.content_tools",
@@ -244,10 +245,10 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def insert_header_near_text(self, filename: str, target_text: str = None,
-                                header_title: str = None, position: str = 'after',
+    def insert_header_near_text(self, filename: str, target_text: Optional[str] = None,
+                                header_title: Optional[str] = None, position: str = 'after',
                                 header_style: str = 'Heading 1',
-                                target_paragraph_index: int = None) -> ToolResult:
+                                target_paragraph_index: Optional[int] = None) -> ToolResult:
         """Insert a header before or after the target paragraph."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.content_tools",
@@ -256,10 +257,10 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def insert_line_near_text(self, filename: str, target_text: str = None,
-                              line_text: str = None, position: str = 'after',
-                              line_style: str = None,
-                              target_paragraph_index: int = None) -> ToolResult:
+    def insert_line_near_text(self, filename: str, target_text: Optional[str] = None,
+                              line_text: Optional[str] = None, position: str = 'after',
+                              line_style: Optional[str] = None,
+                              target_paragraph_index: Optional[int] = None) -> ToolResult:
         """Insert a new line or paragraph before or after the target paragraph."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.content_tools",
@@ -268,9 +269,9 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def insert_numbered_list_near_text(self, filename: str, target_text: str = None,
-                                       list_items: list = None, position: str = 'after',
-                                       target_paragraph_index: int = None,
+    def insert_numbered_list_near_text(self, filename: str, target_text: Optional[str] = None,
+                                       list_items: Optional[list] = None, position: str = 'after',
+                                       target_paragraph_index: Optional[int] = None,
                                        bullet_type: str = 'bullet') -> ToolResult:
         """Insert a bulleted or numbered list before or after the target paragraph."""
         result = self._call_tool(
@@ -281,7 +282,7 @@ class OfficeDocxToolkit(Toolkit):
         return ToolResult(content=result)
 
     def replace_block_below_header(self, filename: str, header_text: str,
-                                   new_paragraphs: list, detect_block_end_fn: str = None) -> ToolResult:
+                                   new_paragraphs: list, detect_block_end_fn: Optional[str] = None) -> ToolResult:
         """Replace the block of paragraphs below a header."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.content_tools",
@@ -291,9 +292,9 @@ class OfficeDocxToolkit(Toolkit):
         return ToolResult(content=result)
 
     def replace_block_between_anchors(self, filename: str, start_anchor_text: str,
-                                      new_paragraphs: list, end_anchor_text: str = None,
-                                      match_fn: str = None,
-                                      new_paragraph_style: str = None) -> ToolResult:
+                                      new_paragraphs: list, end_anchor_text: Optional[str] = None,
+                                      match_fn: Optional[str] = None,
+                                      new_paragraph_style: Optional[str] = None) -> ToolResult:
         """Replace all content between start and end anchor text."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.content_tools",
@@ -305,8 +306,8 @@ class OfficeDocxToolkit(Toolkit):
     # === Format tools ===
 
     def format_text(self, filename: str, paragraph_index: int, start_pos: int, end_pos: int,
-                    bold: bool = None, italic: bool = None, underline: bool = None,
-                    color: str = None, font_size: int = None, font_name: str = None) -> ToolResult:
+                    bold: Optional[bool] = None, italic: Optional[bool] = None, underline: Optional[bool] = None,
+                    color: Optional[str] = None, font_size: Optional[int] = None, font_name: Optional[str] = None) -> ToolResult:
         """Format a specific range of text within a paragraph."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.format_tools",
@@ -315,10 +316,10 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def create_custom_style(self, filename: str, style_name: str, bold: bool = None,
-                            italic: bool = None, font_size: int = None,
-                            font_name: str = None, color: str = None,
-                            base_style: str = None) -> ToolResult:
+    def create_custom_style(self, filename: str, style_name: str, bold: Optional[bool] = None,
+                            italic: Optional[bool] = None, font_size: Optional[int] = None,
+                            font_name: Optional[str] = None, color: Optional[str] = None,
+                            base_style: Optional[str] = None) -> ToolResult:
         """Create a custom style in the document."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.format_tools",
@@ -327,8 +328,8 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def format_table(self, filename: str, table_index: int, has_header_row: bool = None,
-                     border_style: str = None, shading: list = None) -> ToolResult:
+    def format_table(self, filename: str, table_index: int, has_header_row: Optional[bool] = None,
+                     border_style: Optional[str] = None, shading: Optional[list] = None) -> ToolResult:
         """Format a table with borders, shading, and structure."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.format_tools",
@@ -445,9 +446,9 @@ class OfficeDocxToolkit(Toolkit):
         return ToolResult(content=result)
 
     def format_table_cell_text(self, filename: str, table_index: int, row_index: int,
-                               col_index: int, text_content: str = None, bold: bool = None,
-                               italic: bool = None, underline: bool = None, color: str = None,
-                               font_size: int = None, font_name: str = None) -> ToolResult:
+                               col_index: int, text_content: Optional[str] = None, bold: Optional[bool] = None,
+                               italic: Optional[bool] = None, underline: Optional[bool] = None, color: Optional[str] = None,
+                               font_size: Optional[int] = None, font_name: Optional[str] = None) -> ToolResult:
         """Format text within a specific table cell."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.format_tools",
@@ -457,8 +458,8 @@ class OfficeDocxToolkit(Toolkit):
         return ToolResult(content=result)
 
     def set_table_cell_padding(self, filename: str, table_index: int, row_index: int,
-                               col_index: int, top: float = None, bottom: float = None,
-                               left: float = None, right: float = None,
+                               col_index: int, top: Optional[float] = None, bottom: Optional[float] = None,
+                               left: Optional[float] = None, right: Optional[float] = None,
                                unit: str = "points") -> ToolResult:
         """Set padding/margins for a specific table cell."""
         result = self._call_tool(
@@ -505,7 +506,7 @@ class OfficeDocxToolkit(Toolkit):
         return ToolResult(content=result)
 
     def add_footnote_after_text(self, filename: str, search_text: str, footnote_text: str,
-                                output_filename: str = None) -> ToolResult:
+                                output_filename: Optional[str] = None) -> ToolResult:
         """Add a footnote after specific text with proper superscript formatting."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.footnote_tools",
@@ -514,7 +515,7 @@ class OfficeDocxToolkit(Toolkit):
         return ToolResult(content=result)
 
     def add_footnote_before_text(self, filename: str, search_text: str, footnote_text: str,
-                                 output_filename: str = None) -> ToolResult:
+                                 output_filename: Optional[str] = None) -> ToolResult:
         """Add a footnote before specific text with proper superscript formatting."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.footnote_tools",
@@ -523,7 +524,7 @@ class OfficeDocxToolkit(Toolkit):
         return ToolResult(content=result)
 
     def add_footnote_enhanced(self, filename: str, paragraph_index: int, footnote_text: str,
-                              output_filename: str = None) -> ToolResult:
+                              output_filename: Optional[str] = None) -> ToolResult:
         """Enhanced footnote addition with guaranteed superscript formatting."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.footnote_tools",
@@ -540,8 +541,8 @@ class OfficeDocxToolkit(Toolkit):
         return ToolResult(content=result)
 
     def customize_footnote_style(self, filename: str, numbering_format: str = "1, 2, 3",
-                                 start_number: int = 1, font_name: str = None,
-                                 font_size: int = None) -> ToolResult:
+                                 start_number: int = 1, font_name: Optional[str] = None,
+                                 font_size: Optional[int] = None) -> ToolResult:
         """Customize footnote numbering and formatting in a Word document."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.footnote_tools",
@@ -549,9 +550,9 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def delete_footnote_from_document(self, filename: str, footnote_id: int = None,
-                                      search_text: str = None,
-                                      output_filename: str = None) -> ToolResult:
+    def delete_footnote_from_document(self, filename: str, footnote_id: Optional[int] = None,
+                                      search_text: Optional[str] = None,
+                                      output_filename: Optional[str] = None) -> ToolResult:
         """Delete a footnote from a Word document."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.footnote_tools",
@@ -559,8 +560,8 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def add_footnote_robust(self, filename: str, search_text: str = None,
-                            paragraph_index: int = None, footnote_text: str = "",
+    def add_footnote_robust(self, filename: str, search_text: Optional[str] = None,
+                            paragraph_index: Optional[int] = None, footnote_text: str = "",
                             validate_location: bool = True, auto_repair: bool = False) -> ToolResult:
         """Add footnote with robust validation and Word compliance."""
         result = self._call_tool(
@@ -578,8 +579,8 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def delete_footnote_robust(self, filename: str, footnote_id: int = None,
-                               search_text: str = None, clean_orphans: bool = True) -> ToolResult:
+    def delete_footnote_robust(self, filename: str, footnote_id: Optional[int] = None,
+                               search_text: Optional[str] = None, clean_orphans: bool = True) -> ToolResult:
         """Delete footnote with comprehensive cleanup and orphan removal."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.footnote_tools",
@@ -606,7 +607,7 @@ class OfficeDocxToolkit(Toolkit):
         )
         return ToolResult(content=result)
 
-    def convert_to_pdf(self, filename: str, output_filename: str = None) -> ToolResult:
+    def convert_to_pdf(self, filename: str, output_filename: Optional[str] = None) -> ToolResult:
         """Convert a Word document to PDF format."""
         result = self._call_tool(
             "server.docx_use_mcp.docx_use_server.tools.extended_document_tools",

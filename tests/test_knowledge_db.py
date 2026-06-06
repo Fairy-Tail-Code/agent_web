@@ -2,10 +2,10 @@
 Tests for knowledge base database operations.
 """
 
-import pytest
+import pytest  # ty:ignore[unresolved-import]
 import uuid
 
-from auth.knowledge_db import (
+from auth.kb_metadata import (
     create_knowledge_base,
     get_knowledge_base,
     list_knowledge_bases,
@@ -81,16 +81,16 @@ class TestKnowledgeBaseCRUD:
         )
 
         assert kb.kb_id == kb_id
-        assert kb.kb_name == "Test KB"
-        assert kb.owner_id == test_user_id
-        assert kb.is_official is False
-        assert kb.is_public is False
+        assert kb.kb_name == "Test KB"  
+        assert kb.owner_id == test_user_id  
+        assert kb.is_official is False  
+        assert kb.is_public is False  
         assert kb.chunking_mode == "document"
         assert kb.chunk_size == 5000
         assert kb.chunk_overlap == 200
         assert kb.max_results == 10
-        assert kb.file_count == 0
-        assert kb.total_chunks == 0
+        assert kb.file_count == 0  
+        assert kb.total_chunks == 0  
         assert kb.is_active is True
         assert kb.indexing_status == "idle"
 
@@ -127,7 +127,7 @@ class TestKnowledgeBaseCRUD:
 
         assert kb is not None
         assert kb.kb_id == test_kb_id
-        assert kb.kb_name == "Test KB"
+        assert kb.kb_name == "Test KB"  
 
     def test_get_nonexistent_knowledge_base(self):
         """Test getting a non-existent knowledge base."""
@@ -151,9 +151,9 @@ class TestKnowledgeBaseCRUD:
         )
 
         assert updated_kb is not None
-        assert updated_kb.kb_name == "Updated Test KB"
+        assert updated_kb.kb_name == "Updated Test KB"  
         assert updated_kb.kb_description == "Updated description"
-        assert updated_kb.is_public is True
+        assert updated_kb.is_public is True  
 
     def test_delete_knowledge_base(self, test_user_id):
         """Test deleting a knowledge base."""
@@ -190,12 +190,12 @@ class TestKnowledgeBaseCRUD:
         # Update file count
         update_kb_file_count(test_kb_id, increment=5)
         kb = get_knowledge_base(test_kb_id)
-        assert kb.file_count == 5
+        assert kb.file_count == 5  # ty:ignore[unresolved-attribute]
 
         # Update chunk count
         update_kb_chunk_count(test_kb_id, increment=100)
         kb = get_knowledge_base(test_kb_id)
-        assert kb.total_chunks == 100
+        assert kb.total_chunks == 100  # ty:ignore[unresolved-attribute]
 
 
 class TestFileOperations:
@@ -220,7 +220,7 @@ class TestFileOperations:
         assert file.file_name == "test.pdf"
         assert file.file_size == 1024
         assert file.file_type == "pdf"
-        assert file.processing_status == "pending"
+        assert file.processing_status == "pending"  
 
     def test_get_file_record(self, test_kb_id):
         """Test getting a file record."""
@@ -273,18 +273,18 @@ class TestFileOperations:
 
         # Update to processing
         updated = update_file_status(file_id, "processing")
-        assert updated.processing_status == "processing"
+        assert updated.processing_status == "processing"  # ty:ignore[unresolved-attribute]
 
         # Update to completed with chunk count
         updated = update_file_status(file_id, "completed", chunk_count=50)
-        assert updated.processing_status == "completed"
-        assert updated.chunk_count == 50
-        assert updated.processed_at is not None
+        assert updated.processing_status == "completed"  # ty:ignore[unresolved-attribute]
+        assert updated.chunk_count == 50  # ty:ignore[unresolved-attribute]
+        assert updated.processed_at is not None  # ty:ignore[unresolved-attribute]
 
         # Update to failed with error
         updated = update_file_status(file_id, "failed", error_message="Test error")
-        assert updated.processing_status == "failed"
-        assert updated.error_message == "Test error"
+        assert updated.processing_status == "failed"  # ty:ignore[unresolved-attribute]
+        assert updated.error_message == "Test error"  # ty:ignore[unresolved-attribute]
 
     def test_delete_file(self, test_kb_id):
         """Test deleting a file record."""

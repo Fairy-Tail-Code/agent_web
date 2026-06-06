@@ -21,7 +21,7 @@ class _PlaceholderMCPTools:
         pass
 
 
-agno_tools_mcp_pkg.MCPTools = _PlaceholderMCPTools
+agno_tools_mcp_pkg.MCPTools = _PlaceholderMCPTools  # ty:ignore[unresolved-attribute]
 sys.modules.setdefault("agno", agno_pkg)
 sys.modules.setdefault("agno.tools", agno_tools_pkg)
 sys.modules.setdefault("agno.tools.mcp", agno_tools_mcp_pkg)

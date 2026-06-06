@@ -1,5 +1,6 @@
 import os
 import re
+import threading
 from contextlib import asynccontextmanager
 
 from agno.os import AgentOS
@@ -79,7 +80,7 @@ def _dedupe_operation_ids() -> None:
 
 @asynccontextmanager
 async def lifespan(app):
-    from knowledge.processor import start_file_processor, stop_file_processor
+    from Agents.knowledge.processor import start_file_processor, stop_file_processor
     from auth.official_kb import ensure_default_official_kbs
 
     log_info("开始启动 Agent 服务")
@@ -100,13 +101,37 @@ async def lifespan(app):
     except Exception as exc:
         log_info(f"官方知识库初始化失败: {exc}")
 
+    # Start OSS sync worker
+    oss_worker = None
+    oss_thread = None
+    try:
+        from storage.oss_sync_worker import OssSyncWorker
+
+        oss_worker = OssSyncWorker()
+        oss_thread = threading.Thread(
+            target=oss_worker.run_forever,
+            daemon=True,
+            name="oss-sync-worker",
+        )
+        oss_thread.start()
+        log_info("OSS 归档 Worker 已启动")
+    except Exception as exc:
+        log_info(f"OSS 归档 Worker 启动失败: {exc}")
+
     log_info(f"已加载 Agent 数量: {len(all_agents)}")
     log_info(f"已加载 Team 数量: {len(all_teams)}")
     log_info(f"已加载 Workflow 数量: {len(all_workflows)}")
     log_info(f"已加载 AGUI 接口数量: {len(agui_interfaces)}")
     yield
 
-    # Cleanup
+    # Cleanup: stop OSS worker
+    if oss_worker:
+        oss_worker.request_stop()
+        if oss_thread and oss_thread.is_alive():
+            oss_thread.join(timeout=10)
+        log_info("OSS 归档 Worker 已停止")
+
+    # Cleanup: stop file processor
     try:
         await stop_file_processor()
         log_info("文件处理器已停止")
@@ -123,10 +148,10 @@ agui_interfaces = [AGUI(agent=agent, prefix=f"/agents/{agent.id}") for agent in 
 ]
 agent_os = AgentOS(
     description="AgentOS v2.4",
-    agents=all_agents,
-    teams=all_teams,
+    agents=all_agents,  # ty:ignore[invalid-argument-type]
+    teams=all_teams,  # ty:ignore[invalid-argument-type]
     workflows=all_workflows,
-    interfaces=agui_interfaces,
+    interfaces=agui_interfaces,  # ty:ignore[invalid-argument-type]
     lifespan=lifespan,
     db=tracing_db,
     tracing=_get_bool_env("ENABLE_OTLP_TRACING", False),
@@ -163,7 +188,7 @@ setup_prometheus_monitoring(
     agent_os=agent_os,
     endpoint="/prom-metrics",
     refresh_interval_s=30,
-    dbs_id=[agent.id for agent in all_agents if agent.db.id == agent.id]
-    + [workflow.id for workflow in all_workflows if workflow.db.id == workflow.id]
-    + [team.id for team in all_teams if team.db.id == team.id],
+    dbs_id=[aid for agent in all_agents if agent.db and agent.db.id == agent.id and (aid := agent.id)]  
+    + [wid for workflow in all_workflows if workflow.db and workflow.db.id == workflow.id and (wid := workflow.id)]  
+    + [tid for team in all_teams if team.db and team.db.id == team.id and (tid := team.id)],  
 )

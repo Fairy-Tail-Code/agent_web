@@ -22,7 +22,7 @@ class OfficeTeamSetupTests(unittest.TestCase):
                 self.tools = list(tools or [])
                 self.kwargs = kwargs
 
-        toolkit_base_module.Toolkit = FakeToolkit
+        toolkit_base_module.Toolkit = FakeToolkit  # ty:ignore[unresolved-attribute]
 
         function_module = types.ModuleType("agno.tools.function")
 
@@ -30,13 +30,13 @@ class OfficeTeamSetupTests(unittest.TestCase):
             def __init__(self, content: str) -> None:
                 self.content = content
 
-        function_module.ToolResult = ToolResult
+        function_module.ToolResult = ToolResult  # ty:ignore[unresolved-attribute]
 
         run_module = types.ModuleType("agno.run")
-        run_module.RunContext = object
+        run_module.RunContext = object  # ty:ignore[unresolved-attribute]
 
         dotenv_module = types.ModuleType("dotenv")
-        dotenv_module.load_dotenv = Mock()
+        dotenv_module.load_dotenv = Mock()  # ty:ignore[unresolved-attribute]
 
         with patch.dict(
             sys.modules,
@@ -80,7 +80,7 @@ class OfficeTeamSetupTests(unittest.TestCase):
             def __init__(self, **kwargs) -> None:
                 self.__dict__.update(kwargs)
 
-        fake_team_module.Team = FakeTeam
+        fake_team_module.Team = FakeTeam  # ty:ignore[unresolved-attribute]
 
         fake_search_agent = types.SimpleNamespace(name="搜索专家Agent", tools=["search-tool"])
         fake_word_agent = types.SimpleNamespace(name="Word文档专家Agent", tools=["docx-tool"])
@@ -89,22 +89,22 @@ class OfficeTeamSetupTests(unittest.TestCase):
         fake_file_toolkit = object()
 
         fake_search_module = types.ModuleType("agent.office_search_agent")
-        fake_search_module.create_office_search_agent = Mock(return_value=fake_search_agent)
+        fake_search_module.create_office_search_agent = Mock(return_value=fake_search_agent)  # ty:ignore[unresolved-attribute]
         fake_word_module = types.ModuleType("agent.office_word_agent")
-        fake_word_module.create_office_word_agent = Mock(return_value=fake_word_agent)
+        fake_word_module.create_office_word_agent = Mock(return_value=fake_word_agent)  # ty:ignore[unresolved-attribute]
         fake_markdown_module = types.ModuleType("agent.office_markdown_agent")
-        fake_markdown_module.create_office_markdown_agent = Mock(return_value=fake_markdown_agent)
+        fake_markdown_module.create_office_markdown_agent = Mock(return_value=fake_markdown_agent)  # ty:ignore[unresolved-attribute]
         fake_pdf_module = types.ModuleType("agent.office_pdf_agent")
-        fake_pdf_module.create_office_pdf_agent = Mock(return_value=fake_pdf_agent)
+        fake_pdf_module.create_office_pdf_agent = Mock(return_value=fake_pdf_agent)  # ty:ignore[unresolved-attribute]
 
         fake_model_config = types.ModuleType("config.model_config")
-        fake_model_config.get_ai_model = Mock(return_value="fake-model")
+        fake_model_config.get_ai_model = Mock(return_value="fake-model")  # ty:ignore[unresolved-attribute]
 
         fake_db_config = types.ModuleType("config.db_config")
-        fake_db_config.create_base_db = Mock(return_value="fake-db")
+        fake_db_config.create_base_db = Mock(return_value="fake-db")  # ty:ignore[unresolved-attribute]
 
         fake_file_toolkit_module = types.ModuleType("tools.office_file_toolkit")
-        fake_file_toolkit_module.OfficeFileToolkit = Mock(return_value=fake_file_toolkit)
+        fake_file_toolkit_module.OfficeFileToolkit = Mock(return_value=fake_file_toolkit)  # ty:ignore[unresolved-attribute]
 
         with patch.dict(
             sys.modules,

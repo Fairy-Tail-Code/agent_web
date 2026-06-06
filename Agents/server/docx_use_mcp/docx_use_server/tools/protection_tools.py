@@ -261,7 +261,7 @@ async def unprotect_document(filename: str, password: str) -> str:
 
     except msoffcrypto.exceptions.InvalidKeyError:
          return f"Failed to decrypt document {filename}: Incorrect password."
-    except msoffcrypto.exceptions.InvalidFormatError:
+    except msoffcrypto.exceptions.InvalidFormatError:  # ty:ignore[unresolved-attribute]
          return f"Failed to decrypt document {filename}: File is not encrypted or is not a supported Office format."
     except Exception as e:
         # Attempt to restore encrypted file content on failure

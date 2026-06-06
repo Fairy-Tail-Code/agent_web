@@ -6,7 +6,9 @@
 
 ---
 
-## 项目结构（当前）
+## 项目结构
+
+### 当前结构
 
 ```
 agent_web/
@@ -14,15 +16,44 @@ agent_web/
 │   ├── agent/                 # Agent 定义
 │   ├── team/                  # Team 定义
 │   ├── tools/                 # Toolkit 定义
+│   │   └── mcp_tools/        # MCP 远程调用工具（待清理）
 │   ├── knowledge/             # 知识库
-│   └── server/               # MCP 服务
-│       ├── data/              # Data MCP 服务
-│       └── docx_use_mcp/      # Docx MCP 服务（待合并）
+│   └── server/               # 服务
+│       ├── data/              # Data MCP 服务（保留）
+│       └── docx_use_mcp/      # ⚠️ 待删除，合并进 office toolkit
 ├── api/                       # FastAPI 入口
 ├── auth/                      # 认证中间件
 ├── config/                    # 配置
 ├── storage/                   # OSS 存储能力（七牛云）
 ├── hook/                      # 钩子
+├── docs/
+└── tests/
+```
+
+### 改造后结构
+
+```
+agent_web/
+├── Agents/
+│   ├── agent/                 # Agent 定义
+│   ├── team/                  # Team 定义
+│   ├── tools/                 # Toolkit 定义
+│   │   ├── office_file_toolkit.py
+│   │   ├── office_docx_toolkit.py  # 新增（从 docx_use_mcp 合并）
+│   │   └── ...（mcp_tools/ 目录删除）
+│   ├── knowledge/             # 知识库
+│   └── server/
+│       └── data/              # Data MCP 服务（保留，CPU 密集型独立服务）
+│           ├── data_process/
+│           └── machine_learning/
+├── api/
+├── auth/
+├── config/
+├── storage/                   # 统一存储模块
+│   ├── qiniu_storage.py
+│   ├── file_manager.py        # 新增
+│   └── oss_sync_worker.py     # 新增
+├── hook/
 ├── docs/
 └── tests/
 ```
@@ -73,12 +104,17 @@ agent_web/
 
 **目标**：将 docx_use_mcp 从独立 MCP 服务改为本地 Toolkit，与 office 系列工具保持架构一致。
 
-### 2.1 删除文件
+### 2.1 删除文件/目录
 
-| 文件 | 原因 |
+| 文件/目录 | 原因 |
 |------|------|
 | `Agents/agent/docx_use_agent.py` | 死代码，未被引用，功能与 `office_word_agent.py` 重叠 |
-| `Agents/tools/mcp_tools/docx_use_mcp_tool.py` | MCPTools 替代品，合并后不再需要 |
+| `Agents/tools/mcp_tools/docx_use_mcp_tool.py` | MCPTools 适配器，合并后不再需要 |
+| `Agents/tools/mcp_tools/` 整个目录 | docx 是唯一消费者，合并后该目录清空可删 |
+| `Agents/server/docx_use_mcp/main.py` | MCP 入口，不再需要 |
+| `Agents/server/docx_use_mcp/setup_mcp.py` | MCP 初始化，不再需要 |
+| `Agents/server/docx_use_mcp/test_formatting.py` | 测试文件，清理 |
+| `Agents/server/docx_use_mcp/__init__.py` | MCP 包入口，删除后只保留 `docx_use_server/` |
 
 ### 2.2 新增 `Agents/tools/office_docx_toolkit.py`
 
@@ -101,13 +137,17 @@ class OfficeDocxToolkit(Toolkit):
 
 `docx_use_mcp_tool` → `OfficeDocxToolkit`
 
-### 2.4 废弃 `Agents/server/docx_use_mcp/main.py` 和 `setup_mcp.py`
+### 2.4 保留 `Agents/server/docx_use_mcp/docx_use_server/`
 
-不再作为独立 MCP 入口，`docx_use_server/` 下的逻辑保留供 `OfficeDocxToolkit` 调用。
+这是 docx 工具的**实际逻辑层**（54 个工具函数），保留供 `OfficeDocxToolkit` 本地调用。但整个 `Agents/server/docx_use_mcp/` 目录的外壳（`main.py`、`setup_mcp.py`、`__init__.py`）需要重写，去掉 MCP 入口，只保留逻辑模块。
 
 ### 2.5 docker-compose.yaml
 
 删除 `docx-use-mcp` 服务相关配置，`DOCX_USE_MCP_URL` 环境变量不再需要。
+
+### 2.6 清理 `Agents/tools/mcp_tools/` 目录
+
+docx 是该目录下唯一（或主要）的消费者，合并后如果目录为空则删除整个目录。
 
 **验收**：Word 专家 Agent 能正常创建/修改文档，功能与改造前一致。
 

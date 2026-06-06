@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 import psycopg
 
-from auth.db import upsert_user, create_user_table
+from auth.user_db import upsert_user, create_user_table
 from auth.model import LocalUser
 from config.db_config import get_db_url, get_psycopg_db_url
 

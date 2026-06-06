@@ -212,7 +212,7 @@ def _maybe_bayes_search(
     """
     try:
         from sklearn.model_selection import StratifiedKFold
-        from skopt import BayesSearchCV  # type: ignore[import]
+        from skopt import BayesSearchCV  
     except ImportError:
         # 未安装 skopt，直接返回原模型
         return model, None

@@ -12,7 +12,7 @@ def _get_bool_env(name: str, default: bool) -> bool:
 
 
 if hasattr(asyncio, "WindowsSelectorEventLoopPolicy"):
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # ty:ignore[deprecated]
 
 
 if __name__ == '__main__':

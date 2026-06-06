@@ -8,7 +8,7 @@ from Agents.agent.office_search_agent import create_office_search_agent
 from Agents.agent.office_word_agent import create_office_word_agent
 from config.db_config import create_base_db
 from config.model_config import get_ai_model
-from tools.office_file_toolkit import OfficeFileToolkit
+from Agents.tools.office_file_toolkit import OfficeFileToolkit
 
 OFFICE_TEAM_INSTRUCTIONS = """
 你是办公Agent团队Leader，负责规划、分派和验收办公文档任务。

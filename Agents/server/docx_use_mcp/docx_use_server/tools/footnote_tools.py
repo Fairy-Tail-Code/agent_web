@@ -68,7 +68,7 @@ async def add_footnote_to_document(filename: str, paragraph_index: int, footnote
             footnote.text = ""
 
             # Create the footnote reference
-            reference = footnote.add_footnote(footnote_text)
+            reference = footnote.add_footnote(footnote_text)  # ty:ignore[unresolved-attribute]
 
             doc.save(filename)
             return f"Footnote added to paragraph {paragraph_index} in {filename}"
@@ -87,7 +87,7 @@ async def add_footnote_to_document(filename: str, paragraph_index: int, footnote
 
             if not found_footnote_section:
                 doc.add_paragraph("\n").add_run()
-                doc.add_paragraph("Footnotes:").bold = True
+                doc.add_paragraph("Footnotes:").bold = True  # ty:ignore[unresolved-attribute]
 
             # Add footnote text
             footnote_para = doc.add_paragraph("¹ " + footnote_text)
@@ -229,8 +229,8 @@ async def convert_footnotes_to_endnotes_in_document(filename: str) -> str:
 
             # Change the footnote reference to an endnote reference
             try:
-                paragraph = doc.paragraphs[ref["paragraph_index"]]
-                paragraph.runs[ref["run_index"]].text = f"†{i+1}"
+                paragraph = doc.paragraphs[ref["paragraph_index"]]  # ty:ignore[invalid-argument-type]
+                paragraph.runs[ref["run_index"]].text = f"†{i+1}"  # ty:ignore[invalid-argument-type]
             except IndexError:
                 # Skip if we can't locate the reference
                 pass
