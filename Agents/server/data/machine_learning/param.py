@@ -1,6 +1,9 @@
 """
 为机器学习工具内部提供参数解析链
 """
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 加载你的参数定义
 
@@ -223,7 +226,12 @@ def param_options_map():
     }
 
 
-from skopt.space import Categorical, Integer, Real  # noqa: E402
+# Guard skopt import - allow module to load without skopt
+try:
+    from skopt.space import Categorical, Integer, Real  # noqa: E402
+    _SKOPT_AVAILABLE = True
+except ImportError:
+    _SKOPT_AVAILABLE = False
 
 
 def get_model_param_spaces():
@@ -359,17 +367,34 @@ def get_model_param_spaces():
     }
 
 
-# 使用示例：获取分类任务中"随机森林"的参数空间
-param_spaces = get_model_param_spaces()
-param_types = param_types()
-param_options_map = param_options_map()
+# Lazy accessors — avoid calling at module level so the import never crashes
+# when skopt is not installed.
 
 
-def cast_params(model_name, params_dict, param_types):
+def _get_param_spaces():
+    """Return BayesSearchCV parameter spaces (requires skopt)."""
+    if not _SKOPT_AVAILABLE:
+        return {}
+    return get_model_param_spaces()
+
+
+def _get_param_types():
+    """Return model-parameter type definitions."""
+    return param_types()
+
+
+def _get_param_options_map():
+    """Return model-parameter enum-option mappings."""
+    return param_options_map()
+
+
+def cast_params(model_name, params_dict, _param_types=None):
     """
     根据 param_types 的类型定义对参数进行类型转换
     (此函数功能完善，无需修改)
     """
+    if _param_types is None:
+        _param_types = _get_param_types()
     casted = {}
     type_map = {
         'int': int,
@@ -379,30 +404,32 @@ def cast_params(model_name, params_dict, param_types):
         'dict': dict
     }
     for k, v in params_dict.items():
-        if k in param_types.get(model_name, {}):
-            typ_str = param_types[model_name][k]
+        if k in _param_types.get(model_name, {}):
+            typ_str = _param_types[model_name][k]
             typ_func = type_map.get(typ_str, str)
             try:
                 casted[k] = typ_func(v)
             except Exception:
-                print(f"Warning: 参数 {k}={v} 类型转换失败 ({typ_str})，已忽略，使用默认值")
+                logger.warning("参数 %s=%s 类型转换失败 (%s)，已忽略，使用默认值", k, v, typ_str)
         else:
-            print(f"Warning: 参数 {k} 对模型 {model_name} 不存在类型定义，忽略。")
+            logger.warning("参数 %s 对模型 %s 不存在类型定义，忽略。", k, model_name)
     return casted
 
 
-def validate_enum_params(model_name, params_dict, param_options_map):
+def validate_enum_params(model_name, params_dict, _param_options_map=None):
     """
     过滤掉不合法的枚举参数
     (此函数功能完善，无需修改)
     """
+    if _param_options_map is None:
+        _param_options_map = _get_param_options_map()
     valid_params = {}
     for k, v in params_dict.items():
-        if k in param_options_map.get(model_name, {}):
-            if v in param_options_map[model_name][k]:
+        if k in _param_options_map.get(model_name, {}):
+            if v in _param_options_map[model_name][k]:
                 valid_params[k] = v
             else:
-                print(f"Warning: 参数 {k}={v} 对模型 {model_name} 不合法，已忽略，使用默认值")
+                logger.warning("参数 %s=%s 对模型 %s 不合法，已忽略，使用默认值", k, v, model_name)
         else:
             valid_params[k] = v
     return valid_params

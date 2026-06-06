@@ -15,6 +15,8 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from agno.utils.log import logger
 
+from auth.login_security import get_login_security
+
 load_dotenv()
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -156,7 +158,6 @@ async def send_magic_link(payload: MagicLinkRequest, request: Request):
 
     # 2. 检查登录计数/锁定
     if LOGIN_SECURITY_ENABLED:
-        from auth.login_security import get_login_security
         login_security = get_login_security()
         check = login_security.check(payload.email, ip)
         if not check.allowed:
@@ -171,7 +172,6 @@ async def send_magic_link(payload: MagicLinkRequest, request: Request):
     except (ValueError, RuntimeError) as e:
         logger.warning(f"Magic link 发送失败: email={payload.email} error={e}")
         if LOGIN_SECURITY_ENABLED:
-            from auth.login_security import get_login_security
             login_security = get_login_security()
             login_security.record_failure(payload.email, ip)
 
@@ -220,7 +220,6 @@ async def login(payload: LoginRequest, request: Request):
 
     # 2. 检查登录计数/锁定
     if LOGIN_SECURITY_ENABLED:
-        from auth.login_security import get_login_security
         login_security = get_login_security()
         check = login_security.check(payload.email, ip)
         if not check.allowed:
@@ -240,7 +239,6 @@ async def login(payload: LoginRequest, request: Request):
     except (ValueError, RuntimeError) as e:
         # 认证失败
         if LOGIN_SECURITY_ENABLED:
-            from auth.login_security import get_login_security
             login_security = get_login_security()
             login_security.record_failure(payload.email, ip)
 
@@ -253,7 +251,6 @@ async def login(payload: LoginRequest, request: Request):
         # 统一错误信息，不区分"用户不存在"和"密码错误"
         remaining = None
         if LOGIN_SECURITY_ENABLED:
-            from auth.login_security import get_login_security
             login_security = get_login_security()
             check = login_security.check(payload.email, ip)
             remaining = check.remaining_attempts
@@ -277,7 +274,6 @@ async def login(payload: LoginRequest, request: Request):
 
     # 4. 登录成功
     if LOGIN_SECURITY_ENABLED:
-        from auth.login_security import get_login_security
         login_security = get_login_security()
         login_security.record_success(payload.email, ip)
 
@@ -312,19 +308,58 @@ async def login(payload: LoginRequest, request: Request):
     )
 
 
-@router.post("/login/supabase", response_model=LoginResponse)
+@router.post("/login/supabase", response_model=LoginResponse, deprecated=True)
 async def login_supabase(payload: LoginRequest, request: Request):
     """
-    旧登录接口（废弃过渡）
+    [DEPRECATED] 旧登录接口（废弃过渡）
 
-    不验证 CAPTCHA，不记录计数。仅用于兼容现有前端迁移。
+    此接口已弃用，请使用 /auth/login 或 /auth/send-magic-link。
+    现已加入 CAPTCHA 验证和登录安全检查。
     """
+    import warnings
+    warnings.warn(
+        "/auth/login/supabase is deprecated. Use /auth/login or /auth/send-magic-link instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    logger.warning("Deprecated endpoint /auth/login/supabase called")
+
     ip = request.client.host if request.client else "unknown"
     user_agent = request.headers.get("user-agent", "")
 
+    # 1. CAPTCHA 验证
+    if CAPTCHA_ENABLED:
+        from auth.captcha import verify_turnstile
+        ok = await verify_turnstile(payload.turnstile_token)
+        if not ok:
+            raise HTTPException(
+                status_code=403,
+                detail="人机验证失败，请重试",
+            )
+
+    # 2. 检查登录计数/锁定
+    if LOGIN_SECURITY_ENABLED:
+        login_security = get_login_security()
+        check = login_security.check(payload.email, ip)
+        if not check.allowed:
+            from auth.login_logs import record_login_log
+            record_login_log(
+                email=payload.email, ip=ip, success=False,
+                user_agent=user_agent, failure_reason="account_locked",
+            )
+            raise HTTPException(
+                status_code=429,
+                detail=check.reason or "账号已锁定，请稍后再试",
+            )
+
+    # 3. 调用 Supabase Auth
     try:
         session = await _supabase_sign_in(payload.email, payload.password)
     except (ValueError, RuntimeError):
+        if LOGIN_SECURITY_ENABLED:
+            login_security = get_login_security()
+            login_security.record_failure(payload.email, ip)
+
         from auth.login_logs import record_login_log
         record_login_log(
             email=payload.email, ip=ip, success=False,
@@ -334,6 +369,11 @@ async def login_supabase(payload: LoginRequest, request: Request):
     except Exception as e:
         logger.error(f"Supabase Auth 异常 (legacy): {e}")
         raise HTTPException(status_code=503, detail="认证服务暂时不可用")
+
+    # 4. 登录成功
+    if LOGIN_SECURITY_ENABLED:
+        login_security = get_login_security()
+        login_security.record_success(payload.email, ip)
 
     from auth.login_logs import record_login_log
     record_login_log(

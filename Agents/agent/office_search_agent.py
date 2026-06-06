@@ -36,9 +36,6 @@ def create_office_search_agent(agent_id: str) -> Agent:
     agent.description = "办公团队搜索专家，负责收集并整理结构化情报。"
     agent.model = get_ai_model()
     agent.db = create_base_db(agent_id)
-    # Note: Fixed knowledge binding removed to enable multi-tenant isolation.
-    # agent.search_knowledge = True  # Disabled, using tools instead
-    # agent.update_knowledge = True  # Disabled, no fixed knowledge to update
     agent.add_history_to_context = True
     agent.add_datetime_to_context = True
     agent.markdown = True

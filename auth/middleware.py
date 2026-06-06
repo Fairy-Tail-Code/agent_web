@@ -18,6 +18,9 @@ PUBLIC_PATHS: frozenset[str] = frozenset({
     "/info",
     "/config",
     "/models",
+    "/auth/login",
+    "/auth/send-magic-link",
+    "/auth/callback",
 })
 
 

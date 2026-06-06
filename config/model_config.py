@@ -13,13 +13,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class Config:
+class ModelConfig:
     """应用配置管理类"""
 
     # SiliconFlow 配置
     SILICONFLOW_API_KEY: Optional[str] = os.getenv("SILICONFLOW_API_KEY")
     SILICONFLOW_MODEL_ID: Optional[str] = os.getenv("SILICONFLOW_MODEL_ID")
-    SILICONFLOW_BESE_URL: Optional[str] = os.getenv("SILICONFLOW_BESE_URL")
+    SILICONFLOW_BASE_URL: Optional[str] = os.getenv("SILICONFLOW_BASE_URL")
 
     # DeepSeek 配置
     DEEPSEEK_API_KEY: Optional[str] = os.getenv("DEEPSEEK_API_KEY")
@@ -44,8 +44,8 @@ class Config:
             print("❌ 缺少必要的环境变量: SILICONFLOW_MODEL_ID")
             return False
 
-        if not cls.SILICONFLOW_BESE_URL:
-            print("❌ 缺少必要的环境变量: SILICONFLOW_BESE_URL")
+        if not cls.SILICONFLOW_BASE_URL:
+            print("❌ 缺少必要的环境变量: SILICONFLOW_BASE_URL")
             return False
 
         return True
@@ -57,7 +57,7 @@ class Config:
         return {
             "id": model_id,
             "api_key": cls.SILICONFLOW_API_KEY,
-            "base_url": cls.SILICONFLOW_BESE_URL,
+            "base_url": cls.SILICONFLOW_BASE_URL,
         }
 
     @classmethod
@@ -87,7 +87,7 @@ class Config:
         return {
             "model": model_id,
             "api_key": cls.SILICONFLOW_API_KEY,
-            "base_url": cls.SILICONFLOW_BESE_URL,
+            "base_url": cls.SILICONFLOW_BASE_URL,
         }
 
 
@@ -103,16 +103,16 @@ def get_ai_model(model_id=None, model_type="deepseek") -> Model:
         模型实例
     """
     if model_type.lower() == "siliconflow":
-        config = Config.get_siliconflow_config(model_id)
+        config = ModelConfig.get_siliconflow_config(model_id)
         return OpenAILike(**config)
 
     elif model_type.lower() == "deepseek":
-        config = Config.get_deepseek_config(model_id)
+        config = ModelConfig.get_deepseek_config(model_id)
         return DeepSeek(**config)
 
     else:
         print("目前仅支持 siliconflow / deepseek，已自动使用 siliconflow")
-        config = Config.get_siliconflow_config(model_id)
+        config = ModelConfig.get_siliconflow_config(model_id)
         return OpenAILike(**config)
 
 
@@ -126,5 +126,5 @@ def get_siliconflow_embedder(id=None) -> OpenAILikeEmbedder:
     Returns:
         siliconflowOpenAIEmbedder实例
     """
-    config = Config.get_siliconflow_embedder_config(id)
+    config = ModelConfig.get_siliconflow_embedder_config(id)
     return OpenAILikeEmbedder(**config)

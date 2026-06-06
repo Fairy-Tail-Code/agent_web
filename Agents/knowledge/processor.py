@@ -226,11 +226,11 @@ class FileProcessor:
         """Count chunks in a vector table."""
         try:
             import psycopg
-            from config.db_config import Config, get_psycopg_db_url
+            from config.db_config import DbConfig, get_psycopg_db_url
 
             with psycopg.connect(get_psycopg_db_url(id="knowledge-processor")) as conn:
                 with conn.cursor() as cur:
-                    cur.execute(f"SELECT COUNT(*) FROM {Config.DB_NAME}.{vector_table_name}")  # ty:ignore[no-matching-overload]
+                    cur.execute(f"SELECT COUNT(*) FROM {DbConfig.DB_NAME}.{vector_table_name}")  # ty:ignore[no-matching-overload]
                     count = cur.fetchone()[0]  # ty:ignore[not-subscriptable]
                     return count
         except Exception as e:

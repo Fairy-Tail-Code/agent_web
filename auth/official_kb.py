@@ -22,7 +22,7 @@ from auth.kb_metadata import (  # noqa: E402
     list_knowledge_bases,     # 列出所有知识库
 )
 # 导入数据库配置与知识库操作工具
-from config.db_config import Config, create_knowledge_vector, create_knowledge, get_psycopg_db_url  # noqa: E402
+from config.db_config import DbConfig, create_knowledge_vector, create_knowledge, get_psycopg_db_url  # noqa: E402
 
 # 官方知识库ID前缀
 OFFICIAL_KB_PREFIX = "official_"
@@ -188,7 +188,7 @@ def _count_chunks(kb_id: str) -> int:
         with psycopg.connect(get_psycopg_db_url(id="official-kb-counter")) as conn:
             with conn.cursor() as cur:
                 safe_kb_id = kb_id.replace("-", "_")
-                cur.execute(f"SELECT COUNT(*) FROM {Config.DB_NAME}.{safe_kb_id}_knowledge_vectors")  # ty:ignore[no-matching-overload]
+                cur.execute(f"SELECT COUNT(*) FROM {DbConfig.DB_NAME}.{safe_kb_id}_knowledge_vectors")  # ty:ignore[no-matching-overload]
                 count = cur.fetchone()[0]  # ty:ignore[not-subscriptable]
                 return count
     except Exception as e:
@@ -300,7 +300,7 @@ def copy_official_kb_to_personal(
                 # 从源知识库读取所有分块数据
                 cur.execute(f"""
                     SELECT embedding, data, meta
-                    FROM {Config.DB_NAME}.{safe_source_id}_knowledge_vectors
+                    FROM {DbConfig.DB_NAME}.{safe_source_id}_knowledge_vectors
                 """)  # ty:ignore[no-matching-overload]
 
                 chunks = cur.fetchall()
@@ -309,7 +309,7 @@ def copy_official_kb_to_personal(
                 for embedding, data, meta in chunks:
                     try:
                         cur.execute(f"""
-                            INSERT INTO {Config.DB_NAME}.{safe_target_id}_knowledge_vectors
+                            INSERT INTO {DbConfig.DB_NAME}.{safe_target_id}_knowledge_vectors
                             (embedding, data, meta)
                             VALUES (%s, %s, %s)
                         """, (embedding, data, meta))  # ty:ignore[invalid-argument-type]

@@ -60,7 +60,9 @@ class FileListResponse(BaseModel):
 def _safe_resolve(relative_path: str) -> Path:
     """解析相对路径并确保不逃逸 BASE_DIR。"""
     resolved = (BASE_DIR / relative_path).resolve()
-    if not str(resolved).startswith(str(BASE_DIR)):
+    try:
+        resolved.relative_to(BASE_DIR)
+    except ValueError:
         raise HTTPException(status_code=403, detail="路径不允许")
     return resolved
 

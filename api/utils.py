@@ -2,6 +2,7 @@ from agno.agent import Agent
 from agno.memory import MemoryManager
 from agno.tools.duckduckgo import DuckDuckGoTools
 
+from api.constants import FILE_DOWNLOAD_HINT
 from config.db_config import create_base_db
 from config.model_config import get_ai_model
 
@@ -47,8 +48,6 @@ def set_default_config_to_agent(agent: Agent):
             db=agent.db,
             debug_mode=False,
         )
-        # Note: Fixed knowledge binding removed to enable multi-tenant isolation.
-        # Agents should use knowledge query tools instead.
 
         # not default config
         agent.stream_intermediate_steps = True  # ty:ignore[unresolved-attribute]
@@ -58,10 +57,6 @@ def set_default_config_to_agent(agent: Agent):
         agent.enable_agentic_memory = True
         agent.store_history_messages=False
 
-        # 每轮对话之后进行记忆
-        # agent.enable_user_memories = True
-        # agent.search_knowledge = True  # Disabled, using tools instead
-        # agent.update_knowledge = True  # Disabled, no fixed knowledge to update
         agent.markdown = True
         agent.add_datetime_to_context = True
         agent.debug_mode = True
@@ -74,18 +69,9 @@ def set_default_config_to_agent(agent: Agent):
         agent.tools.extend([DuckDuckGoTools(),])  # ty:ignore[unresolved-attribute]
 
         # ── 统一追加文件下载提示到 system_message ──
-        _file_download_hint = (
-            "\n\n【文件交付规范】当你使用工具生成了文件（如 .docx/.pdf/.xlsx/.md 等），"
-            "在回复的末尾必须包含该文件的下载链接，格式为：\n"
-            "[下载 文件名](/backend/files/download/相对路径)\n"
-            "其中「相对路径」是文件相对于 /app/user_cache/ 的路径。"
-            "例如文件保存在 /app/user_cache/office/output/docx/报告.docx，"
-            "则链接为 [下载 报告.docx](/backend/files/download/office/output/docx/报告.docx)。"
-            "可以给出多个文件链接。"
-        )
         if hasattr(agent, "system_message") and agent.system_message:
-            agent.system_message += _file_download_hint  # ty:ignore[unsupported-operator]
+            agent.system_message += FILE_DOWNLOAD_HINT  # ty:ignore[unsupported-operator]
         elif hasattr(agent, "instructions") and agent.instructions:
-            agent.instructions += _file_download_hint  # ty:ignore[unsupported-operator]
+            agent.instructions += FILE_DOWNLOAD_HINT  # ty:ignore[unsupported-operator]
     else:
         return agent

@@ -8,7 +8,7 @@ import psycopg
 from dataclasses import dataclass
 from typing import List, Optional
 from datetime import datetime, timezone
-from config.db_config import get_psycopg_db_url, Config
+from config.db_config import get_psycopg_db_url, DbConfig
 
 
 @dataclass
@@ -283,8 +283,8 @@ def drop_knowledge_tables(vector_table_name: str, content_table_name: str) -> No
     """Drop the vector and content tables for a knowledge base."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(f"DROP TABLE IF EXISTS {Config.DB_NAME}.{content_table_name}")
-            cur.execute(f"DROP TABLE IF EXISTS {Config.DB_NAME}.{vector_table_name}")
+            cur.execute(f"DROP TABLE IF EXISTS {DbConfig.DB_NAME}.{content_table_name}")
+            cur.execute(f"DROP TABLE IF EXISTS {DbConfig.DB_NAME}.{vector_table_name}")
             conn.commit()
 
 

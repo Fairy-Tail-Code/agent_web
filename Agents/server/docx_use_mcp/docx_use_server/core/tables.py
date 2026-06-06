@@ -1,11 +1,15 @@
 """
 Table-related operations for Word Document Server.
 """
+import logging
+
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
 from docx.oxml.shared import OxmlElement, qn
 from docx.shared import RGBColor
+
+logger = logging.getLogger(__name__)
 
 
 def set_cell_border(cell, **kwargs):
@@ -192,7 +196,7 @@ def set_cell_shading(cell, fill_color=None, pattern="clear", pattern_color="auto
         return True
 
     except Exception as e:
-        print(f"Error setting cell shading: {e}")
+        logger.error("Error setting cell shading: %s", e)
         return False
 
 
@@ -215,7 +219,7 @@ def apply_alternating_row_shading(table, color1="FFFFFF", color2="F2F2F2"):
                 set_cell_shading(cell, fill_color=fill_color)
         return True
     except Exception as e:
-        print(f"Error applying alternating row shading: {e}")
+        logger.error("Error applying alternating row shading: %s", e)
         return False
 
 
@@ -253,7 +257,7 @@ def highlight_header_row(table, header_color="4472C4", text_color="FFFFFF"):
                                 pass  # Skip if color format is invalid
         return True
     except Exception as e:
-        print(f"Error highlighting header row: {e}")
+        logger.error("Error highlighting header row: %s", e)
         return False
 
 
@@ -279,7 +283,7 @@ def set_cell_shading_by_position(table, row_index, col_index, fill_color, patter
         else:
             return False
     except Exception as e:
-        print(f"Error setting cell shading by position: {e}")
+        logger.error("Error setting cell shading by position: %s", e)
         return False
 
 
@@ -320,7 +324,7 @@ def merge_cells(table, start_row, start_col, end_row, end_col):
         return True
 
     except Exception as e:
-        print(f"Error merging cells: {e}")
+        logger.error("Error merging cells: %s", e)
         return False
 
 
@@ -402,7 +406,7 @@ def set_cell_alignment(cell, horizontal="left", vertical="top"):
         return True
 
     except Exception as e:
-        print(f"Error setting cell alignment: {e}")
+        logger.error("Error setting cell alignment: %s", e)
         return False
 
 
@@ -428,7 +432,7 @@ def set_cell_alignment_by_position(table, row_index, col_index, horizontal="left
         else:
             return False
     except Exception as e:
-        print(f"Error setting cell alignment by position: {e}")
+        logger.error("Error setting cell alignment by position: %s", e)
         return False
 
 
@@ -450,7 +454,7 @@ def set_table_alignment(table, horizontal="left", vertical="top"):
                 set_cell_alignment(cell, horizontal, vertical)
         return True
     except Exception as e:
-        print(f"Error setting table alignment: {e}")
+        logger.error("Error setting table alignment: %s", e)
         return False
 
 
@@ -509,7 +513,7 @@ def set_column_width(table, col_index, width, width_type="dxa"):
         return True
 
     except Exception as e:
-        print(f"Error setting column width: {e}")
+        logger.error("Error setting column width: %s", e)
         return False
 
 
@@ -549,7 +553,7 @@ def set_column_widths(table, widths, width_type="dxa"):
                 return False
         return True
     except Exception as e:
-        print(f"Error setting column widths: {e}")
+        logger.error("Error setting column widths: %s", e)
         return False
 
 
@@ -606,7 +610,7 @@ def set_table_width(table, width, width_type="dxa"):
         return True
 
     except Exception as e:
-        print(f"Error setting table width: {e}")
+        logger.error("Error setting table width: %s", e)
         return False
 
 
@@ -648,7 +652,7 @@ def auto_fit_table(table):
         return True
 
     except Exception as e:
-        print(f"Error setting auto-fit table: {e}")
+        logger.error("Error setting auto-fit table: %s", e)
         return False
 
 
@@ -734,7 +738,7 @@ def format_cell_text(cell, text_content=None, bold=None, italic=None, underline=
         return True
 
     except Exception as e:
-        print(f"Error formatting cell text: {e}")
+        logger.error("Error formatting cell text: %s", e)
         return False
 
 
@@ -768,7 +772,7 @@ def format_cell_text_by_position(table, row_index, col_index, text_content=None,
         else:
             return False
     except Exception as e:
-        print(f"Error formatting cell text by position: {e}")
+        logger.error("Error formatting cell text by position: %s", e)
         return False
 
 
@@ -831,7 +835,7 @@ def set_cell_padding(cell, top=None, bottom=None, left=None, right=None, unit="d
         return True
 
     except Exception as e:
-        print(f"Error setting cell padding: {e}")
+        logger.error("Error setting cell padding: %s", e)
         return False
 
 
@@ -861,5 +865,5 @@ def set_cell_padding_by_position(table, row_index, col_index, top=None, bottom=N
         else:
             return False
     except Exception as e:
-        print(f"Error setting cell padding by position: {e}")
+        logger.error("Error setting cell padding by position: %s", e)
         return False

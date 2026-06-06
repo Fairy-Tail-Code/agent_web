@@ -1,4 +1,5 @@
 import asyncio
+import os
 from typing import Any, Dict, List, Optional, Union
 
 from fastapi import APIRouter, HTTPException, Request
@@ -8,6 +9,8 @@ from Agents.server.data.request_context import resolve_request_user_id
 from Agents.server.data.machine_learning.process_pool import submit_train_task
 
 ml_router = APIRouter(prefix="/ml", tags=["Machine_Learning"])
+
+_ML_TRAINING_TIMEOUT = int(os.getenv("ML_TRAINING_TIMEOUT", "600"))
 
 
 class TrainModelRequest(BaseModel):
@@ -46,7 +49,18 @@ async def api_train_model(request: Request, payload: TrainModelRequest):
             save_dir=payload.save_dir,
             save_model=payload.save_model,
         )
-        result = await asyncio.wrap_future(future)
+        result = await asyncio.wait_for(asyncio.wrap_future(future), timeout=_ML_TRAINING_TIMEOUT)
+    except asyncio.TimeoutError:
+        raise HTTPException(
+            status_code=408,
+            detail=f"训练超时（{_ML_TRAINING_TIMEOUT}秒）",
+        ) from None
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except HTTPException:
+        raise
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
