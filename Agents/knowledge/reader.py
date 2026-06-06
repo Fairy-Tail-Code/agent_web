@@ -6,12 +6,14 @@ reader based on file type. Users cannot override this selection.
 """
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Optional, Union
+
+from agno.knowledge.chunking.strategy import ChunkingStrategy
 
 
 def get_reader(
     file_path: Optional[Union[str, Path]] = None,
-    chunker: Optional["ChunkingStrategy"] = None,  # ty:ignore[unresolved-reference]
+    chunker: Optional[ChunkingStrategy] = None,
     url: Optional[str] = None,
 ):
     """

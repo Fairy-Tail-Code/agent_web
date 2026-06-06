@@ -68,7 +68,7 @@ async def add_footnote_to_document(filename: str, paragraph_index: int, footnote
             footnote.text = ""
 
             # Create the footnote reference
-            reference = footnote.add_footnote(footnote_text)  # ty:ignore[unresolved-attribute]
+            _ = footnote.add_footnote(footnote_text)  # ty:ignore[unresolved-attribute]
 
             doc.save(filename)
             return f"Footnote added to paragraph {paragraph_index} in {filename}"
@@ -201,7 +201,7 @@ async def convert_footnotes_to_endnotes_in_document(filename: str) -> str:
         doc.add_heading("Endnotes:", level=1)
 
         # Create a placeholder for endnote content, we'll fill it later
-        endnote_content = []
+        _ = []
 
         # Find the footnote text at the bottom of the page
 
@@ -408,7 +408,7 @@ async def customize_footnote_style(filename: str, numbering_format: str = "1, 2,
         format_symbols = get_format_symbols(numbering_format, len(footnote_refs) + start_number)
 
         # Apply custom formatting to footnotes
-        count = customize_footnote_formatting(doc, footnote_refs, format_symbols, start_number, footnote_style)
+        _ = customize_footnote_formatting(doc, footnote_refs, format_symbols, start_number, footnote_style)
 
         # Save the document
         doc.save(filename)

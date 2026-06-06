@@ -111,7 +111,7 @@ def extract_comment_data(comment_element, index: int) -> Optional[Dict[str, Any]
             try:
                 date = datetime.datetime.fromisoformat(date_str.replace('Z', '+00:00'))
                 date = date.isoformat()
-            except:
+            except Exception:
                 date = date_str
 
         # Extract comment text

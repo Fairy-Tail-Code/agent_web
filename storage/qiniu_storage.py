@@ -154,7 +154,6 @@ class QiniuStorage:
 
     def get_download_url(self, url: str, expires: int = 2592000) -> str:
         if url.startswith(self.config.domain):
-            key = url.replace(self.config.domain + "/", "")
             return self.auth.private_download_url(url, expires=expires)
         return url
 

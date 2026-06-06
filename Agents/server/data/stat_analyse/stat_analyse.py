@@ -99,7 +99,7 @@ class EnhancedDataAnalyzer:
                         "VIF": round(vif, 2),
                         "共线性等级": "S" if vif > 10 else "中度" if vif > 5 else "可接受"
                     })
-                except:
+                except Exception:
                     vif_data.append({"变量": col, "VIF": "计算失败"})
 
             return vif_data
@@ -135,7 +135,7 @@ class EnhancedDataAnalyzer:
                         # "p值": round(p_value, 4),
                         "方差齐性": "Y" if p_value > 0.05 else "否"
                     })
-                except:
+                except Exception:
                     continue
 
         return results if results else {"message": "无可用的分类-数值列对"}
@@ -246,7 +246,7 @@ class EnhancedDataAnalyzer:
                     "显著性": "Y" if p < 0.05 else "不显著",
                     # "正态性": "Y" if is_normal else "N"
                 })
-            except:
+            except Exception:
                 continue
 
         return results
@@ -306,7 +306,7 @@ class EnhancedDataAnalyzer:
                         # "p值": round(p, 4),
                         "显著性": "Y" if p < 0.05 else "不显著"
                     })
-                except:
+                except Exception:
                     continue
 
         return results
@@ -328,16 +328,15 @@ class EnhancedDataAnalyzer:
                 if min_expected >= 5:
                     # 卡方检验
                     method = "Chi-square"
-                    stat, p_value = chi2, p
+                    p_value = p
                 else:
                     # Fisher精确检验（仅支持2x2）
                     if contingency.shape == (2, 2):
                         _, p_value = stats.fisher_exact(contingency)
                         method = "Fisher exact"
-                        stat = None
                     else:
                         method = "Chi-square (警告:期望频数<5)"
-                        stat, p_value = chi2, p
+                        p_value = p
 
                 results.append({
                     "变量1": col1,
@@ -348,7 +347,7 @@ class EnhancedDataAnalyzer:
                     "显著性": "Y" if p_value < 0.05 else "无显著关联",
                     "最小期望频数": round(min_expected, 2)
                 })
-            except:
+            except Exception:
                 continue
 
         return results
@@ -407,7 +406,7 @@ class EnhancedDataAnalyzer:
                                 "p_value": round(p_value, 4),
                                 "is_normal": p_value > 0.05
                             }
-                except:
+                except Exception:
                     col_stats["normality"] = {"error": "检验失败"}
 
             # 定类数据统计

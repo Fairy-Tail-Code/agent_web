@@ -106,14 +106,14 @@ async def get_comments_by_author(filename: str, author: str) -> str:
         }, indent=2)
 
 
-async def get_comments_for_paragraph(filename: str, paragraph_index: int) -> str:
+async def get_comments_for_paragraph_tool(filename: str, paragraph_index: int) -> str:
     """
     Extract comments for a specific paragraph in a Word document.
-    
+
     Args:
         filename: Path to the Word document
         paragraph_index: Index of the paragraph (0-based)
-        
+
     Returns:
         JSON string containing comments for the specified paragraph
     """
@@ -146,10 +146,7 @@ async def get_comments_for_paragraph(filename: str, paragraph_index: int) -> str
         all_comments = extract_all_comments(doc)
 
         # Filter for the specific paragraph
-        from Agents.server.docx_use_mcp.docx_use_server.core.comments import (
-            get_comments_for_paragraph as core_get_comments_for_paragraph,
-        )
-        para_comments = core_get_comments_for_paragraph(all_comments, paragraph_index)
+        para_comments = get_comments_for_paragraph(all_comments, paragraph_index)
 
         # Get the paragraph text for context
         paragraph_text = doc.paragraphs[paragraph_index].text

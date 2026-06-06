@@ -98,7 +98,7 @@ async def format_text(filename: str, paragraph_index: int, start_pos: int, end_p
 
         # Add text before target
         if start_pos > 0:
-            run_before = paragraph.add_run(text[:start_pos])
+            _ = paragraph.add_run(text[:start_pos])
 
         # Add target text with formatting
         run_target = paragraph.add_run(target_text)
@@ -139,7 +139,7 @@ async def format_text(filename: str, paragraph_index: int, start_pos: int, end_p
 
         # Add text after target
         if end_pos < len(text):
-            run_after = paragraph.add_run(text[end_pos:])
+            _ = paragraph.add_run(text[end_pos:])
 
         doc.save(filename)
         return f"Text '{target_text}' formatted successfully in paragraph {paragraph_index}."
@@ -190,7 +190,7 @@ async def create_custom_style(filename: str, style_name: str,
             font_properties['color'] = color
 
         # Create the style
-        new_style = create_style(
+        _ = create_style(
             doc,
             style_name,
             WD_STYLE_TYPE.PARAGRAPH,

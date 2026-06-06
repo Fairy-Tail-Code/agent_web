@@ -82,7 +82,7 @@ class TestDataFileManager(unittest.TestCase):
 
     def test_table_auto_creation(self):
         """storage_files table is created on first instantiation."""
-        fm = self._make_fm()
+        _ = self._make_fm()  # noqa: F841 – instantiation triggers table creation
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='storage_files'")

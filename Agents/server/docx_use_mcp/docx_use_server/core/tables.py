@@ -97,7 +97,7 @@ def apply_table_style(table, has_header_row=False, border_style=None, shading=No
                         cell = table.rows[i].cells[j]
                         shading_elm = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{color}"/>')
                         cell._tc.get_or_add_tcPr().append(shading_elm)
-                    except:
+                    except Exception:
                         # Skip if color format is invalid
                         pass
 
@@ -124,11 +124,11 @@ def copy_table(source_table, target_doc):
     try:
         if source_table.style:
             new_table.style = source_table.style
-    except:
+    except Exception:
         # Fall back to default grid style
         try:
             new_table.style = 'Table Grid'
-        except:
+        except Exception:
             pass
 
     # Copy cell contents
@@ -249,7 +249,7 @@ def highlight_header_row(table, header_color="4472C4", text_color="FFFFFF"):
                                 g = int(text_color[2:4], 16)
                                 b = int(text_color[4:6], 16)
                                 run.font.color.rgb = RGBColor(r, g, b)
-                            except:
+                            except Exception:
                                 pass  # Skip if color format is invalid
         return True
     except Exception as e:

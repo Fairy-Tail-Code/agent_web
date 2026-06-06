@@ -223,7 +223,7 @@ def param_options_map():
     }
 
 
-from skopt.space import Categorical, Integer, Real
+from skopt.space import Categorical, Integer, Real  # noqa: E402
 
 
 def get_model_param_spaces():

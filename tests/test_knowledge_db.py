@@ -36,7 +36,7 @@ def test_kb_id(test_user_id):
     safe_kb_id = kb_id.replace("-", "_")
 
     try:
-        kb = create_knowledge_base(
+        _ = create_knowledge_base(
             kb_id=kb_id,
             kb_name="Test KB",
             kb_description="Test knowledge base",
@@ -367,7 +367,7 @@ class TestMultiUserIsolation:
         kb_id = str(uuid.uuid4())
         safe_kb_id = kb_id.replace("-", "_")
 
-        kb = create_knowledge_base(
+        _ = create_knowledge_base(
             kb_id=kb_id,
             kb_name="User A's KB",
             kb_description="Private KB for user A",

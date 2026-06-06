@@ -1,4 +1,3 @@
-from typing import Optional
 """
 Main entry point for the Word Document MCP Server.
 Acts as the central controller for the MCP server that handles Word document operations.
@@ -7,6 +6,7 @@ Supports multiple transports: stdio, sse, and streamable-http using standalone F
 
 import os
 import sys
+from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -15,10 +15,11 @@ print("Loading configuration from .env file...")
 load_dotenv()
 # Set required environment variable for FastMCP 2.8.1+
 os.environ.setdefault('FASTMCP_LOG_LEVEL', 'INFO')
-from fastmcp import FastMCP
-from mcp.types import ToolAnnotations
 
-from Agents.server.docx_use_mcp.docx_use_server.tools import (
+from fastmcp import FastMCP  # noqa: E402
+from mcp.types import ToolAnnotations  # noqa: E402
+
+from Agents.server.docx_use_mcp.docx_use_server.tools import (  # noqa: E402
     comment_tools,
     content_tools,
     document_tools,
@@ -27,7 +28,7 @@ from Agents.server.docx_use_mcp.docx_use_server.tools import (
     format_tools,
     protection_tools,
 )
-from Agents.server.docx_use_mcp.docx_use_server.tools.content_tools import (
+from Agents.server.docx_use_mcp.docx_use_server.tools.content_tools import (  # noqa: E402
     replace_block_between_manual_anchors_tool,
     replace_paragraph_block_below_header_tool,
 )

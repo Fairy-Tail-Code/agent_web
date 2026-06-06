@@ -42,10 +42,9 @@ from Agents.knowledge.knowledge import (
     CopyKnowledgeResponse,
 )
 
-knowledge_router = APIRouter(prefix="/knowledge", tags=["knowledge"])
-
-# Storage
 from storage import get_qiniu_storage
+
+knowledge_router = APIRouter(prefix="/knowledge", tags=["knowledge"])
 
 # Temporary directory for processing files
 TEMP_PROCESSING_DIR = Path("./user_cache/knowledge_temp")
@@ -72,7 +71,6 @@ async def create_user_knowledge_base(
     # Derive table name from kb_id (replace hyphens with underscores)
     safe_kb_id = kb_id.replace("-", "_")
     vector_table_name = f"{safe_kb_id}_knowledge_vectors"
-    content_table_name = f"{safe_kb_id}_knowledge_contents"
 
     # Create database record
     # Note: chunking_mode persists the "auto" strategy selection, while the
@@ -589,11 +587,9 @@ async def copy_to_knowledge_base(
     # Perform actual vector data copying
     from auth.official_kb import copy_official_kb_to_personal
     try:
-        copy_result = copy_official_kb_to_personal(source_kb.kb_id, target_kb.kb_id)
-        chunks_copied = copy_result.get("chunks_copied", 0)
+        copy_official_kb_to_personal(source_kb.kb_id, target_kb.kb_id)
     except Exception as e:
         logger.error(f"Failed to copy KB content: {e}")
-        chunks_copied = 0
 
     return CopyKnowledgeResponse(
         copy_id=copy_record.copy_id,

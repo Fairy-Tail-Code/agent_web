@@ -161,24 +161,24 @@ app = agent_os.get_app()
 _dedupe_operation_ids()
 app.openapi_schema = None
 
-from auth.middleware import AuthMiddleware
+from auth.middleware import AuthMiddleware  # noqa: E402
 
 app.add_middleware(AuthMiddleware)
 log_info("已注册网关认证中间件")
 
 # Register knowledge base router
-from api.knowledge_router import knowledge_router
+from api.knowledge_router import knowledge_router  # noqa: E402
 app.include_router(knowledge_router)
 log_info("已注册知识库管理路由")
 
 # Register file download router
-from api.file_router import file_router
+from api.file_router import file_router  # noqa: E402
 app.include_router(file_router)
 log_info("已注册文件下载路由")
 
 # Register login router
-from auth.login_router import router as login_router
-from auth.login_logs import ensure_login_logs_table
+from auth.login_router import router as login_router  # noqa: E402
+from auth.login_logs import ensure_login_logs_table  # noqa: E402
 app.include_router(login_router)
 ensure_login_logs_table()
 log_info("已注册登录安全路由")

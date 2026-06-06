@@ -12,9 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from Agents.server.repo_monitor_mcp.scheduler import RepoMonitorScheduler  # ty:ignore[unresolved-import]
+from Agents.server.repo_monitor_mcp.scheduler import RepoMonitorScheduler  # ty:ignore[unresolved-import]  # noqa: E402
 
-from Agents.server.repo_monitor_mcp.storage import RepoMonitorStorage  # ty:ignore[unresolved-import]
+from Agents.server.repo_monitor_mcp.storage import RepoMonitorStorage  # ty:ignore[unresolved-import]  # noqa: E402
 
 
 

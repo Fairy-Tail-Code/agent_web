@@ -5,6 +5,7 @@ Automatically detects file types and selects appropriate readers and chunkers.
 This module provides a centralized, hard-coded mapping that users cannot modify.
 """
 
+import importlib.util
 from pathlib import Path
 from typing import Dict, List, Tuple, Union, Callable
 from enum import Enum
@@ -12,75 +13,27 @@ from enum import Enum
 from agno.knowledge.chunking.strategy import ChunkingStrategyType, ChunkingStrategy
 from agno.knowledge.chunking.document import DocumentChunking
 from agno.knowledge.chunking.fixed import FixedSizeChunking
-
-# Optional imports for chunkers that may have extra dependencies
-try:
-    from agno.knowledge.chunking.semantic import SemanticChunking
-    SEMANTIC_CHUNKER_AVAILABLE = True
-except ImportError:
-    SEMANTIC_CHUNKER_AVAILABLE = False
-
-try:
-    from agno.knowledge.chunking.markdown import MarkdownChunking
-    MARKDOWN_CHUNKER_AVAILABLE = True
-except ImportError:
-    MARKDOWN_CHUNKER_AVAILABLE = False
-
 from agno.knowledge.chunking.row import RowChunking
-
-try:
-    from agno.knowledge.chunking.code import CodeChunking
-    CODE_CHUNKER_AVAILABLE = True
-except ImportError:
-    CODE_CHUNKER_AVAILABLE = False
-
 from agno.knowledge.chunking.recursive import RecursiveChunking
-
-try:
-    from agno.knowledge.chunking.agentic import AgenticChunking
-    AGENTIC_CHUNKER_AVAILABLE = True
-except ImportError:
-    AGENTIC_CHUNKER_AVAILABLE = False
-
-# Reader imports - all optional with fallbacks
-try:
-    from agno.knowledge.reader.pdf_reader import PDFReader
-    PDF_READER_AVAILABLE = True
-except ImportError:
-    PDF_READER_AVAILABLE = False
-
 from agno.knowledge.reader.csv_reader import CSVReader
 from agno.knowledge.reader.excel_reader import ExcelReader
-
-try:
-    from agno.knowledge.reader.docx_reader import DocxReader
-    DOCX_READER_AVAILABLE = True
-except ImportError:
-    DOCX_READER_AVAILABLE = False
-
-try:
-    from agno.knowledge.reader.pptx_reader import PPTXReader
-    PPTX_READER_AVAILABLE = True
-except ImportError:
-    PPTX_READER_AVAILABLE = False
-
 from agno.knowledge.reader.json_reader import JSONReader
 from agno.knowledge.reader.markdown_reader import MarkdownReader
 from agno.knowledge.reader.text_reader import TextReader
-
-try:
-    from agno.knowledge.reader.website_reader import WebsiteReader
-    WEBSITE_READER_AVAILABLE = True
-except ImportError:
-    WEBSITE_READER_AVAILABLE = False
-
-try:
-    from agno.knowledge.reader.docling_reader import DoclingReader
-    DOCLING_READER_AVAILABLE = True
-except ImportError:
-    DOCLING_READER_AVAILABLE = False
-
 from agno.utils.log import logger
+
+# Optional chunkers - check availability without importing the unused name
+SEMANTIC_CHUNKER_AVAILABLE = importlib.util.find_spec("agno.knowledge.chunking.semantic") is not None
+MARKDOWN_CHUNKER_AVAILABLE = importlib.util.find_spec("agno.knowledge.chunking.markdown") is not None
+CODE_CHUNKER_AVAILABLE = importlib.util.find_spec("agno.knowledge.chunking.code") is not None
+AGENTIC_CHUNKER_AVAILABLE = importlib.util.find_spec("agno.knowledge.chunking.agentic") is not None
+
+# Optional readers - check availability without importing the unused name
+PDF_READER_AVAILABLE = importlib.util.find_spec("agno.knowledge.reader.pdf_reader") is not None
+DOCX_READER_AVAILABLE = importlib.util.find_spec("agno.knowledge.reader.docx_reader") is not None
+PPTX_READER_AVAILABLE = importlib.util.find_spec("agno.knowledge.reader.pptx_reader") is not None
+WEBSITE_READER_AVAILABLE = importlib.util.find_spec("agno.knowledge.reader.website_reader") is not None
+DOCLING_READER_AVAILABLE = importlib.util.find_spec("agno.knowledge.reader.docling_reader") is not None
 
 
 class FileType(Enum):
@@ -326,6 +279,7 @@ def _create_markdown_chunker(chunk_size: int = 5000, overlap: int = 0, **kwargs)
         logger.warning("MarkdownChunking not available, falling back to DocumentChunking")
         return _create_document_chunker(chunk_size, overlap, **kwargs)
 
+    from agno.knowledge.chunking.markdown import MarkdownChunking
     return MarkdownChunking(
         chunk_size=chunk_size,
         overlap=overlap,
@@ -365,6 +319,7 @@ def _create_agentic_chunker(chunk_size: int = 5000, overlap: int = 0, **kwargs) 
         logger.warning("AgenticChunking not available, falling back to DocumentChunking")
         return _create_document_chunker(chunk_size, overlap, **kwargs)
 
+    from agno.knowledge.chunking.agentic import AgenticChunking
     return AgenticChunking(max_chunk_size=chunk_size)
 
 

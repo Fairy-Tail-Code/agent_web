@@ -32,7 +32,7 @@ def user_a_private_kb(user_a):
     safe_kb_id = kb_id.replace("-", "_")
 
     try:
-        kb = create_knowledge_base(
+        _ = create_knowledge_base(
             kb_id=kb_id,
             kb_name="User A Private KB",
             kb_description="Private KB for user A",
@@ -60,7 +60,7 @@ def user_a_public_kb(user_a):
     safe_kb_id = kb_id.replace("-", "_")
 
     try:
-        kb = create_knowledge_base(
+        _ = create_knowledge_base(
             kb_id=kb_id,
             kb_name="User A Public KB",
             kb_description="Public KB from user A",
@@ -88,7 +88,7 @@ def official_kb():
     safe_kb_id = kb_id.replace("-", "_")
 
     try:
-        kb = create_knowledge_base(
+        _ = create_knowledge_base(
             kb_id=kb_id,
             kb_name="Official KB",
             kb_description="System official KB",
@@ -247,7 +247,7 @@ class TestFileAccessIsolation:
         """Create a file in user A's KB."""
         file_id = str(uuid.uuid4())
 
-        file = create_file_record(
+        _ = create_file_record(
             file_id=file_id,
             kb_id=user_a_private_kb,
             file_name="secret.pdf",

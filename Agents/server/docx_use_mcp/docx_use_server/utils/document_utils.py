@@ -1,7 +1,7 @@
 """
 Document utility functions for Word Document Server.
 """
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional
 
 from docx import Document
 from docx.oxml import OxmlElement
@@ -502,13 +502,11 @@ def replace_paragraph_block_below_header(
 
     # Find the header paragraph first
     header_para = None
-    header_idx = None
     for i, para in enumerate(doc.paragraphs):
         para_text = para.text.strip().lower()
         is_toc = is_toc_paragraph(para)
         if para_text == header_text.strip().lower() and not is_toc:
             header_para = para
-            header_idx = i
             break
 
     if header_para is None:

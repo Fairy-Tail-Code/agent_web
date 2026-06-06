@@ -86,7 +86,6 @@ def find_text(doc_path: str, text_to_find: str, match_case: bool = True, whole_w
                 if whole_word:
                     # For whole word search, we need to check word boundaries
                     words = para_text.split()
-                    found = False
                     for word_idx, word in enumerate(words):
                         if (word == search_text or
                             (not match_case and word.lower() == search_text.lower())):
@@ -96,7 +95,6 @@ def find_text(doc_path: str, text_to_find: str, match_case: bool = True, whole_w
                                 "context": para.text[:100] + ("..." if len(para.text) > 100 else "")
                             })
                             results["total_count"] += 1
-                            found = True
 
                     # Break after checking all words
                     break
@@ -133,7 +131,6 @@ def find_text(doc_path: str, text_to_find: str, match_case: bool = True, whole_w
                             if whole_word:
                                 # For whole word search, check word boundaries
                                 words = para_text.split()
-                                found = False
                                 for word_idx, word in enumerate(words):
                                     if (word == search_text or
                                         (not match_case and word.lower() == search_text.lower())):
@@ -143,7 +140,6 @@ def find_text(doc_path: str, text_to_find: str, match_case: bool = True, whole_w
                                             "context": para.text[:100] + ("..." if len(para.text) > 100 else "")
                                         })
                                         results["total_count"] += 1
-                                        found = True
 
                                 # Break after checking all words
                                 break

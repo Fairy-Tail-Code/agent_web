@@ -196,7 +196,7 @@ async def merge_documents(target_filename: str, source_filenames: List[str], add
                 try:
                     if paragraph.style and paragraph.style.name in target_doc.styles:
                         new_paragraph.style = target_doc.styles[paragraph.style.name]
-                except:
+                except Exception:
                     pass
 
                 # Copy run formatting

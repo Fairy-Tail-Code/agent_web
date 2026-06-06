@@ -102,7 +102,7 @@ def customize_footnote_formatting(doc, footnote_refs, format_symbols, start_numb
             if footnote_style:
                 try:
                     ref['paragraph'].style = footnote_style
-                except:
+                except Exception:
                     pass
             count += 1
     return count
@@ -422,7 +422,7 @@ def add_footnote_robust(
         marker_rPr = etree.SubElement(marker_run, f'{{{W_NS}}}rPr')
         marker_rStyle = etree.SubElement(marker_rPr, f'{{{W_NS}}}rStyle')
         marker_rStyle.set(f'{{{W_NS}}}val', 'FootnoteReference')
-        marker_ref = etree.SubElement(marker_run, f'{{{W_NS}}}footnoteRef')
+        etree.SubElement(marker_run, f'{{{W_NS}}}footnoteRef')
 
         # Add space after marker
         space_run = etree.SubElement(fn_para, f'{{{W_NS}}}r')
@@ -825,7 +825,7 @@ def add_endnote(doc, paragraph_index: int, endnote_text: str):
     # Endnotes go at the very end
     doc.add_page_break()
     doc.add_heading("Endnotes", level=1)
-    endnote_para = doc.add_paragraph(f"† {endnote_text}")
+    doc.add_paragraph(f"† {endnote_text}")
 
     return doc
 

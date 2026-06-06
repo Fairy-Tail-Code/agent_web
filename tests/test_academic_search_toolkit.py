@@ -50,7 +50,7 @@ sys.modules.setdefault("agno.tools", agno_tools_pkg)
 sys.modules.setdefault("agno.tools.function", agno_tools_function_pkg)
 sys.modules.setdefault("httpx", httpx_pkg)
 
-from Agents.tools.academic_search_toolkit import AcademicSearchToolkit  # ty:ignore[unresolved-import]
+from Agents.tools.academic_search_toolkit import AcademicSearchToolkit  # ty:ignore[unresolved-import]  # noqa: E402
 
 
 ARXIV_XML = """<?xml version="1.0" encoding="UTF-8"?>

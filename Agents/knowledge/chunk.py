@@ -146,14 +146,3 @@ class Chunk:
             return AgenticChunking(max_chunk_size=self.chunk_size)
         else:
             raise ValueError(f"Unknown chunking mode: {self.mode}")
-
-    @staticmethod
-    def get_chunker(mode: str = "document", **kwargs) -> Union[DocumentChunking, FixedSizeChunking]:
-        """
-        Static method to get a chunker (deprecated, use instance method instead).
-
-        This method is kept for backward compatibility.
-        Use `Chunk(file_path=..., mode='auto').get_chunker()` instead.
-        """
-        chunk = Chunk(mode=mode, **kwargs)
-        return chunk.get_chunker()

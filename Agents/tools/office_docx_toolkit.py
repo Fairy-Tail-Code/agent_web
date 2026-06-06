@@ -1,4 +1,3 @@
-from typing import Optional
 """
 Word 文档本地工具包
 
@@ -7,8 +6,8 @@ Word 文档本地工具包
 
 与 OfficeFileManager 集成，实现用户隔离的文件路径管理。
 """
-
 import asyncio
+from typing import Optional
 
 from agno.tools import Toolkit
 from agno.tools.function import ToolResult

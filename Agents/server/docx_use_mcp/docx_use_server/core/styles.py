@@ -44,7 +44,7 @@ def ensure_table_style(doc):
     """
     try:
         # Try to access the style to see if it exists
-        style = doc.styles['Table Grid']
+        doc.styles['Table Grid']
     except KeyError:
         # If style doesn't exist, we'll handle it at usage time
         pass
@@ -71,7 +71,7 @@ def create_style(doc, style_name, style_type, base_style=None, font_properties=N
         # Check if style already exists
         style = doc.styles.get_by_id(style_name, WD_STYLE_TYPE.PARAGRAPH)
         return style
-    except:
+    except Exception:
         # Create new style
         new_style = doc.styles.add_style(style_name, style_type)
 

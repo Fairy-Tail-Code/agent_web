@@ -314,7 +314,7 @@ def train_model_once(
             y_test,
             y_pred,
             labels=labels,
-            target_names=[str(l) for l in labels],
+            target_names=[str(label) for label in labels],
         )
         metrics = {"accuracy": acc, "classification_report": report}
 

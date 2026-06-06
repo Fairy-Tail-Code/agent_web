@@ -15,14 +15,14 @@ import psycopg
 logger = logging.getLogger(__name__)
 
 # 导入知识库元数据相关功能
-from auth.kb_metadata import (
+from auth.kb_metadata import (  # noqa: E402
     create_knowledge_base,    # 创建知识库
     get_knowledge_base,       # 获取单个知识库信息
     KnowledgeBaseRecord,      # 知识库记录数据结构
     list_knowledge_bases,     # 列出所有知识库
 )
 # 导入数据库配置与知识库操作工具
-from config.db_config import Config, create_knowledge_vector, create_knowledge, get_psycopg_db_url
+from config.db_config import Config, create_knowledge_vector, create_knowledge, get_psycopg_db_url  # noqa: E402
 
 # 官方知识库ID前缀
 OFFICIAL_KB_PREFIX = "official_"
@@ -79,7 +79,6 @@ def create_official_knowledge_base(
     # 生成安全的数据库表名（替换横杠为下划线）
     safe_kb_id = kb_id.replace("-", "_")
     vector_table_name = f"{safe_kb_id}_knowledge_vectors"    # 向量数据表名
-    content_table_name = f"{safe_kb_id}_knowledge_contents"  # 内容数据表名
 
     # 创建数据库记录
     # 注意：chunking_mode 持久化存储"自动"策略选择，

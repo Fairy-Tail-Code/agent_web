@@ -384,7 +384,7 @@ async def add_table_of_contents(filename: str, title: str = "Table of Contents",
             try:
                 if paragraph.style:
                     p.style = paragraph.style.name
-            except:
+            except Exception:
                 pass
 
         # Copy tables
