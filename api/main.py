@@ -155,7 +155,7 @@ agent_os = AgentOS(
     lifespan=lifespan,
     db=tracing_db,
     tracing=_get_bool_env("ENABLE_OTLP_TRACING", False),
-    cors_allowed_origins=["https://os.agno.com"],
+    cors_allowed_origins=os.getenv("CORS_ALLOWED_ORIGINS", "https://os.agno.com").split(","),
 )
 app = agent_os.get_app()
 _dedupe_operation_ids()

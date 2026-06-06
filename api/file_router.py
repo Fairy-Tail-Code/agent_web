@@ -38,7 +38,7 @@ ALLOWED_EXTENSIONS = {
 }
 
 # 单个文件最大允许下载大小（100 MB）
-MAX_FILE_SIZE = 100 * 1024 * 1024
+MAX_FILE_SIZE = int(os.getenv("FILE_MAX_DOWNLOAD_SIZE", str(100 * 1024 * 1024)))
 
 
 # ── Pydantic Models ───────────────────────────────────────────

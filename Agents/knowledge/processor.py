@@ -7,6 +7,7 @@ Uses asyncio for background task processing.
 
 import asyncio
 import logging
+import os
 from typing import Set, Optional
 from pathlib import Path
 from urllib.parse import urlparse
@@ -26,7 +27,7 @@ from config.db_config import create_knowledge
 logger = logging.getLogger(__name__)
 
 # Temporary directory for processing downloaded files
-TEMP_PROCESSING_DIR = Path("./user_cache/knowledge_temp")
+TEMP_PROCESSING_DIR = Path(os.getenv("KNOWLEDGE_TEMP_DIR", "./user_cache/knowledge_temp"))
 TEMP_PROCESSING_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -245,7 +246,7 @@ def get_file_processor() -> FileProcessor:
     """Get global file processor instance."""
     global _file_processor
     if _file_processor is None:
-        _file_processor = FileProcessor(max_workers=3)
+        _file_processor = FileProcessor(max_workers=int(os.getenv("KNOWLEDGE_PROCESSOR_WORKERS", "3")))
     return _file_processor
 
 

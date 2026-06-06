@@ -6,6 +6,7 @@ Provides endpoints for managing user knowledge bases with multi-tenant isolation
 from agno.utils.log import logger
 from typing import List, Optional
 from pathlib import Path
+import os
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File, Query
@@ -47,7 +48,7 @@ from storage import get_qiniu_storage
 knowledge_router = APIRouter(prefix="/knowledge", tags=["knowledge"])
 
 # Temporary directory for processing files
-TEMP_PROCESSING_DIR = Path("./user_cache/knowledge_temp")
+TEMP_PROCESSING_DIR = Path(os.getenv("KNOWLEDGE_TEMP_DIR", "./user_cache/knowledge_temp"))
 TEMP_PROCESSING_DIR.mkdir(parents=True, exist_ok=True)
 
 
