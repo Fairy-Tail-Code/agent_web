@@ -8,14 +8,10 @@ Word 文档本地工具包
 """
 
 import asyncio
-import json
-import os
-from typing import List, Optional
 
 from agno.tools import Toolkit
 from agno.tools.function import ToolResult
 
-from agno.utils.log import logger
 
 
 def _run_async(coro):

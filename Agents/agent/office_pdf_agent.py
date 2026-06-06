@@ -5,7 +5,7 @@ from agno.agent import Agent
 from config.db_config import create_base_db
 from config.model_config import get_ai_model
 from tools.office_file_toolkit import OfficeFileToolkit
-from tools.office_pdf_toolkit import OfficePdfToolkit
+from Agents.tools.office_pdf_toolkit import OfficePdfToolkit
 from tools.knowledge_query_tool import create_knowledge_query_tool, create_knowledge_list_tool
 
 OFFICE_PDF_SYSTEM_MESSAGE = """

@@ -18,7 +18,7 @@ from server.docx_use_mcp.docx_use_server.core.protection import (
     create_signature_info,
     verify_document_protection,
 )
-from server.docx_use_mcp.docx_use_server.utils.file_utils import (
+from Agents.server.docx_use_mcp.docx_use_server.utils import (
     check_file_writeable,
     ensure_docx_extension,
 )

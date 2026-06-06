@@ -7,9 +7,8 @@ Uses temp SQLite databases to test login counting, locking, and CAPTCHA.
 import os
 import sqlite3
 import tempfile
-import time
 import unittest
-from unittest.mock import patch, AsyncMock
+from unittest.mock import patch
 
 
 class TestLoginSecurity(unittest.TestCase):

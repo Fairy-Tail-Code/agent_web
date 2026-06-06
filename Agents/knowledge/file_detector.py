@@ -6,7 +6,7 @@ This module provides a centralized, hard-coded mapping that users cannot modify.
 """
 
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional, Union, Callable, TYPE_CHECKING
+from typing import Dict, List, Tuple, Union, Callable
 from enum import Enum
 
 from agno.knowledge.chunking.strategy import ChunkingStrategyType, ChunkingStrategy
@@ -51,7 +51,6 @@ except ImportError:
 
 from agno.knowledge.reader.csv_reader import CSVReader
 from agno.knowledge.reader.excel_reader import ExcelReader
-from agno.knowledge.reader.field_labeled_csv_reader import FieldLabeledCSVReader
 
 try:
     from agno.knowledge.reader.docx_reader import DocxReader

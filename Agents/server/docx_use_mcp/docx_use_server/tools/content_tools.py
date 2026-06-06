@@ -13,7 +13,7 @@ from docx.shared import Inches, Pt, RGBColor
 from server.docx_use_mcp.docx_use_server.core.styles import (
     ensure_heading_style,
 )
-from server.docx_use_mcp.docx_use_server.utils.document_utils import (
+from Agents.server.docx_use_mcp.docx_use_server.utils import (
     find_and_replace_text,
     insert_header_near_text,
     insert_line_or_paragraph_near_text,
@@ -21,7 +21,7 @@ from server.docx_use_mcp.docx_use_server.utils.document_utils import (
     replace_block_between_manual_anchors,
     replace_paragraph_block_below_header,
 )
-from server.docx_use_mcp.docx_use_server.utils.file_utils import (
+from Agents.server.docx_use_mcp.docx_use_server.utils import (
     check_file_writeable,
     ensure_docx_extension,
 )

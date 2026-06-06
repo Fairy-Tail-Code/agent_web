@@ -2,8 +2,6 @@
 Tests for file detector functionality.
 """
 
-import pytest
-from pathlib import Path
 
 from knowledge.file_detector import (
     FileDetector,

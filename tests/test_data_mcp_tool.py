@@ -26,7 +26,7 @@ sys.modules.setdefault("agno", agno_pkg)
 sys.modules.setdefault("agno.tools", agno_tools_pkg)
 sys.modules.setdefault("agno.tools.mcp", agno_tools_mcp_pkg)
 
-from tools.mcp_tools.data_mcp_tool import create_data_mcp_tools
+from Agents.tools.mcp_tools.data_mcp_tool import create_data_mcp_tools
 
 
 class DataMcpToolTests(unittest.TestCase):

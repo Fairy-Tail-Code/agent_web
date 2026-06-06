@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from agno.team import Team
 
-from agent.office_markdown_agent import create_office_markdown_agent
-from agent.office_pdf_agent import create_office_pdf_agent
-from agent.office_search_agent import create_office_search_agent
-from agent.office_word_agent import create_office_word_agent
+from Agents.agent.office_markdown_agent import create_office_markdown_agent
+from Agents.agent.office_pdf_agent import create_office_pdf_agent
+from Agents.agent.office_search_agent import create_office_search_agent
+from Agents.agent.office_word_agent import create_office_word_agent
 from config.db_config import create_base_db
 from config.model_config import get_ai_model
 from tools.office_file_toolkit import OfficeFileToolkit

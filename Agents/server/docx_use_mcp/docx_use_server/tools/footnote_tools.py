@@ -23,7 +23,7 @@ from server.docx_use_mcp.docx_use_server.core.footnotes import (
     get_format_symbols,
     validate_document_footnotes,
 )
-from server.docx_use_mcp.docx_use_server.utils.file_utils import (
+from Agents.server.docx_use_mcp.docx_use_server.utils import (
     check_file_writeable,
     ensure_docx_extension,
 )

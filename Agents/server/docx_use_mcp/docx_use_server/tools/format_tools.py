@@ -31,7 +31,7 @@ from server.docx_use_mcp.docx_use_server.core.tables import (
 from server.docx_use_mcp.docx_use_server.core.tables import (
     set_table_width as set_table_width_func,
 )
-from server.docx_use_mcp.docx_use_server.utils.file_utils import (
+from Agents.server.docx_use_mcp.docx_use_server.utils import (
     check_file_writeable,
     ensure_docx_extension,
 )

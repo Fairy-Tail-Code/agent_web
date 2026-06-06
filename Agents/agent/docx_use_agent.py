@@ -2,7 +2,7 @@ from agno.agent import Agent
 
 from config.db_config import create_base_db
 from config.model_config import get_ai_model
-from tools.mcp_tools.docx_use_mcp_tool import create_docx_use_mcp_tool
+from tools.office_docx_toolkit import OfficeDocxToolkit
 from tools.knowledge_query_tool import create_knowledge_query_tool, create_knowledge_list_tool
 
 DOCX_WORD_SYSTEM_MESSAGE = """
@@ -16,7 +16,7 @@ DOCX_WORD_SYSTEM_MESSAGE = """
 你的执行要求：
 - 先理解文档目标、受众、结构和语气，再开始操作。
 - 涉及已有文档时，先读取和理解原文档，再进行修改。
-- 优先调用 docx MCP 工具实际生成或修改文档，而不是只给文字建议。
+- 优先调用 docx 工具实际生成或修改文档，而不是只给文字建议。
 - 输出前检查文档是否已经成功生成；如果失败，基于错误信息重试，最多三次。
 - 需要排版时，使用清晰的标题层级、段落结构、表格和列表，保持办公文档风格。
 - 结果必须面向交付，不能输出占位符、半成品或无关解释。
@@ -32,7 +32,7 @@ def create_docx_use_agent(agent_id: str) -> Agent:
         id=agent_id,
         name="Word文档专家Agent",
         tools=[
-            create_docx_use_mcp_tool(),
+            OfficeDocxToolkit(),
             create_knowledge_query_tool(),
             create_knowledge_list_tool(),
         ],
@@ -41,10 +41,7 @@ def create_docx_use_agent(agent_id: str) -> Agent:
     agent.description = "办公 Word 文档专家，负责生成、改写和整理 .docx 文档。"
     agent.model = get_ai_model()
     agent.db = create_base_db(agent_id)
-    # Note: Fixed knowledge binding removed to enable multi-tenant isolation.
-    # Agents now query user knowledge bases through tools.
-    # agent.search_knowledge = True  # Disabled, using tools instead
-    agent.update_knowledge = False  # Disabled, no fixed knowledge to update
+    agent.update_knowledge = False
     agent.add_history_to_context = True
     agent.add_datetime_to_context = True
     agent.markdown = True

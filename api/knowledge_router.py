@@ -5,13 +5,10 @@ Provides endpoints for managing user knowledge bases with multi-tenant isolation
 """
 from agno.utils.log import logger
 from typing import List, Optional
-from datetime import datetime
 from pathlib import Path
 import uuid
-import aiofiles
 
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File, Query
-from fastapi.responses import FileResponse as FastAPIFileResponse
 
 from auth.permissions import get_current_user
 from auth.model import CurrentUser
@@ -26,17 +23,14 @@ from auth.kb_metadata import (
     create_file_record,
     get_file_record,
     list_files_by_kb,
-    update_file_status,
     delete_file as db_delete_file,
     update_kb_file_count,
-    update_kb_chunk_count,
-    update_kb_indexing_status,
     record_knowledge_copy,
     get_kb_copies,
 )
-from config.db_config import Config, create_knowledge_vector, create_knowledge
+from config.db_config import create_knowledge_vector, create_knowledge
 
-from models.knowledge import (
+from knowledge.knowledge import (
     KnowledgeBaseCreate,
     KnowledgeBaseUpdate,
     KnowledgeBaseResponse,

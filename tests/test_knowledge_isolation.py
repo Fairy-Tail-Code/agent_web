@@ -12,7 +12,6 @@ from auth.knowledge_db import (
     list_accessible_knowledge_bases,
     delete_knowledge_base,
     create_file_record,
-    update_file_status,
 )
 
 

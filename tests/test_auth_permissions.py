@@ -1,4 +1,3 @@
-import pytest
 from fastapi import FastAPI, Request, Depends
 from starlette.testclient import TestClient
 from starlette.middleware.base import BaseHTTPMiddleware

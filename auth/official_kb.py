@@ -5,11 +5,9 @@
 官方知识库对非管理员用户为只读状态，并为所有用户提供默认知识库内容。
 """
 
-import uuid
 import hashlib
 import logging
 from typing import List, Optional, Dict
-from datetime import datetime
 from pathlib import Path
 
 import psycopg
@@ -113,7 +111,7 @@ def create_official_knowledge_base(
     except Exception as e:
         logger.error(f"为官方知识库创建向量数据库失败 '{name}': {e}")
         # 创建失败，回滚删除知识库记录
-        from auth.kb_metadata import delete_knowledge_base, drop_knowledge_tables
+        from auth.kb_metadata import delete_knowledge_base
         delete_knowledge_base(kb_id)
         return None
 

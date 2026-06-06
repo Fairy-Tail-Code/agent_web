@@ -11,7 +11,7 @@ user_cache
 db
 tests
 docs
-server/meta_mcp
-server/web_driver_monitor
-server/repo_monitor_mcp
-server/computer_mcp
+Agents/server/meta_mcp
+Agents/server/web_driver_monitor
+Agents/server/repo_monitor_mcp
+Agents/server/computer_mcp

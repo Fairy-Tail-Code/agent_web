@@ -7,8 +7,7 @@ Uses asyncio for background task processing.
 
 import asyncio
 import logging
-from typing import Dict, Set, Optional
-from datetime import datetime, timezone
+from typing import Set, Optional
 from pathlib import Path
 from urllib.parse import urlparse
 import aiohttp
@@ -23,8 +22,6 @@ from auth.kb_metadata import (
 )
 
 from config.db_config import create_knowledge
-from knowledge.chunk import Chunk
-from knowledge.reader import get_reader
 
 logger = logging.getLogger(__name__)
 

@@ -6,7 +6,7 @@ Users cannot override this selection - the system uses FileDetector to
 choose the optimal reader and chunker for each file.
 """
 
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel, Field
 

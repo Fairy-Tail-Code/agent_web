@@ -1,7 +1,7 @@
 from agno.agent import Agent
 
-from agent.data_agent import create_data_agent
-from agent.docx_use_agent import create_docx_use_agent
+from Agents.agent.data_agent import create_data_agent
+from Agents.agent.docx_use_agent import create_docx_use_agent
 from api import utils
 
 data_agent = create_data_agent(agent_id="data_agent")

@@ -21,3 +21,4 @@ build/
 
 # Temp files
 /try*.py
+/.claude

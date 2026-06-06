@@ -39,9 +39,7 @@ except ImportError:
     AGENTIC_CHUNKER_AVAILABLE = False
 
 from knowledge.file_detector import (
-    FileDetector,
     get_chunker_for_file,
-    ChunkingStrategyType,
 )
 
 

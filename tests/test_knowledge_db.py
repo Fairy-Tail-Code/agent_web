@@ -4,7 +4,6 @@ Tests for knowledge base database operations.
 
 import pytest
 import uuid
-from datetime import datetime, timezone
 
 from auth.knowledge_db import (
     create_knowledge_base,

@@ -10,11 +10,11 @@ import shutil
 import subprocess
 from typing import Optional
 
-from server.docx_use_mcp.docx_use_server.utils.extended_document_utils import (
+from Agents.server.docx_use_mcp.docx_use_server.utils import (
     find_text,
     get_paragraph_text,
 )
-from server.docx_use_mcp.docx_use_server.utils.file_utils import (
+from Agents.server.docx_use_mcp.docx_use_server.utils import (
     check_file_writeable,
     ensure_docx_extension,
 )
@@ -95,7 +95,7 @@ async def convert_to_pdf(filename: str, output_filename: Optional[str] = None) -
     # Ensure the output directory exists
     output_dir = os.path.dirname(output_filename)
     if not output_dir:
-        output_dir = os.path.abspath('.')
+        output_dir = os.path.abspath('')
 
     # Create the directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)

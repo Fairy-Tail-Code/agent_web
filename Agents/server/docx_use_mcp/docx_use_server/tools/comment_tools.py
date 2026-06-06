@@ -14,7 +14,7 @@ from server.docx_use_mcp.docx_use_server.core.comments import (
     filter_comments_by_author,
     get_comments_for_paragraph,
 )
-from server.docx_use_mcp.docx_use_server.utils.file_utils import ensure_docx_extension
+from Agents.server.docx_use_mcp.docx_use_server.utils import ensure_docx_extension
 
 
 async def get_all_comments(filename: str) -> str:

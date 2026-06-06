@@ -11,13 +11,13 @@ from server.docx_use_mcp.docx_use_server.core.styles import (
     ensure_heading_style,
     ensure_table_style,
 )
-from server.docx_use_mcp.docx_use_server.utils.document_utils import (
+from Agents.server.docx_use_mcp.docx_use_server.utils import (
     extract_document_text,
     get_document_properties,
     get_document_structure,
     get_document_xml,
 )
-from server.docx_use_mcp.docx_use_server.utils.file_utils import (
+from Agents.server.docx_use_mcp.docx_use_server.utils import (
     check_file_writeable,
     create_document_copy,
     ensure_docx_extension,
