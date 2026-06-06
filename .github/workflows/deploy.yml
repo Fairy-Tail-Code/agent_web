@@ -32,7 +32,8 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # ── 构建后端 Python 镜像（app / data-mcp / docx-use-mcp 共用）──
+      # ── 构建后端 Python 镜像（app / data-mcp 共用）──
+      # docx-use-mcp 已合并到 app 内的 OfficeDocxToolkit，不再单独部署
       - name: Build & push backend image
         uses: docker/build-push-action@v6
         with:
@@ -59,13 +60,12 @@ jobs:
           cache-to: type=gha,mode=max
 
       # ── 构建 gateway (nginx + 前端静态资源) ──
-      # gateway Dockerfile 的 context 原本是 .. (父目录)，因为要 COPY agent-web-fronted/
-      # CI 中前端已 clone 为子目录 agent-web-fronted，所以 context 用当前目录即可
-      # 但 Dockerfile 里 COPY 路径是 agent-web-fronted/xxx，我们需要在根目录下有这个目录
-      - name: Move frontend for gateway build context
+      # gateway Dockerfile COPY 路径以 agent-web-fronted/ 开头，
+      # CI 中前端已 clone 为 agent-web-fronted/，context 用 . 即可匹配
+      - name: Verify frontend directory for gateway build
         run: |
-          # Dockerfile 里用 agent-web-fronted-2/... 路径，在 context=. 下刚好能找到
-          ls -la agent-web-fronted-2/ | head -5
+          ls -la agent-web-fronted/ | head -5
+          echo "✅ agent-web-fronted/ 目录就绪，gateway 构建可正常引用"
 
       - name: Build & push gateway image
         uses: docker/build-push-action@v6
