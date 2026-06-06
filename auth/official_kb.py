@@ -152,7 +152,7 @@ def populate_official_kb(
                 continue
 
             # 通过文件检测器自动获取对应读取器和分块器
-            from Agents.knowledge.file_detector import get_reader_and_chunker
+            from Agents.knowledge.reader import get_reader_and_chunker
             reader, chunker = get_reader_and_chunker(
                 doc_path,
                 chunk_size=5000,

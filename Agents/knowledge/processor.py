@@ -186,7 +186,7 @@ class FileProcessor:
 
             # Use FileDetector to automatically select reader and chunker based on file type
             # This ensures optimal processing for each file type without user selection
-            from Agents.knowledge.file_detector import get_reader_and_chunker
+            from Agents.knowledge.reader import get_reader_and_chunker
             reader, chunker = get_reader_and_chunker(
                 file_path,
                 chunk_size=kb.chunk_size,
