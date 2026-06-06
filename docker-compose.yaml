@@ -7,7 +7,7 @@ services:  # 定义所有要启动的服务/容器
       POSTGRES_USER: ${DB_USER:-postgres}  # 初始化数据库用户名；优先用 DB_USER，没有就默认 postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}  # 初始化数据库密码；优先用 DB_PASSWORD，没有就默认 postgres
     expose:  # 只把端口暴露给同一个 Docker 网络内的其他容器，不暴露到宿主机公网
-      - "5432"  # PostgreSQL 默认端口；app/data-mcp/docx-use-mcp 可以通过 postgres:5432 访问
+      - "5432"  # PostgreSQL 默认端口；app/data-mcp 可以通过 postgres:5432 访问
     volumes:  # 配置数据持久化挂载
       - agent_pg_data:/var/lib/postgresql/data  # 把数据库真实数据目录挂到 Docker 命名卷，容器删了数据也还在
     healthcheck:  # 容器健康检查，用来判断 postgres 是否真的可用
@@ -61,45 +61,7 @@ services:  # 定义所有要启动的服务/容器
     networks:  # 加入 Docker 网络
       - agent_backend  # 加入后，app 可以通过 data-mcp 这个服务名访问它
 
-  docx-use-mcp:  # 文档/Office/docx 处理 MCP 服务
-    build:  # 从源码构建镜像
-      context: .  # 构建上下文是当前项目目录
-      dockerfile: Dockerfile  # 使用当前目录下的 Dockerfile
-    command: python docx_use_mcp_main.py  # 容器启动后运行 docx_use_mcp_main.py
-    env_file:  # 加载环境变量文件
-      - .env  # 读取 .env
-    environment:  # 给容器设置环境变量
-      DB_DRIVER: postgresql+psycopg  # 数据库驱动
-      DB_HOST: postgres  # 数据库主机名，指向 postgres 容器
-      DB_PORT: "5432"  # PostgreSQL 端口
-      DB_USER: ${DB_USER:-postgres}  # 数据库用户名
-      DB_PASSWORD: ${DB_PASSWORD:-postgres}  # 数据库密码
-      DB_NAME: ${DB_NAME:-agent_db}  # 数据库名
-
-      MCP_TRANSPORT: streamable-http  # MCP 服务使用 streamable-http 传输协议
-      MCP_HOST: 0.0.0.0  # 服务监听所有网卡；容器内必须这样，其他容器才能访问
-      MCP_PORT: "8008"  # MCP 服务监听端口
-      OFFICE_BASE_DIR: /app/user_cache/office  # Office/docx 相关文件的工作目录
-    expose:  # 只暴露给 Docker 内部网络
-      - "8008"  # docx-use-mcp 服务端口；app 通过 http://docx-use-mcp:8008/mcp 访问
-    volumes:  # 挂载持久化目录
-      - agent_user_cache:/app/user_cache  # 和其他服务共享 user_cache，方便读写同一批文件
-    depends_on:  # 启动依赖
-      postgres:  # 依赖 postgres
-        condition: service_healthy  # 等数据库健康后再启动
-    healthcheck:  # 健康检查
-      test:  # 健康检查命令
-        - CMD  # 直接执行命令
-        - python  # 使用 python
-        - -c  # 执行后面的 Python 字符串
-        - import socket,sys; s=socket.socket(); s.settimeout(2); s.connect(("127.0.0.1", 8008)); s.close()  # 尝试连接本容器 8008 端口
-      interval: 10s  # 每 10 秒检查一次
-      timeout: 5s  # 每次最多 5 秒
-      retries: 12  # 连续失败 12 次后判定不健康
-      start_period: 20s  # 启动宽限时间 20 秒
-    restart: unless-stopped  # 异常退出自动重启
-    networks:  # 网络配置
-      - agent_backend  # 加入 agent_backend 网络
+  # docx-use-mcp 已合并到 app 内的 OfficeDocxToolkit，不再作为独立 MCP 服务运行
 
   app:  # 主应用服务，一般是你的 FastAPI/Agno 后端
     build:  # 从源码构建镜像
@@ -124,7 +86,6 @@ services:  # 定义所有要启动的服务/容器
 
       DATA_DB_PATH: /app/user_cache/data/data.db  # 数据服务使用的数据文件路径
       DATA_MCP_URL: http://data-mcp:8085/mcp  # data-mcp 的内部访问地址；这里用服务名 data-mcp
-      DOCX_USE_MCP_URL: http://docx-use-mcp:8008/mcp  # docx-use-mcp 的内部访问地址
       DATA_UPLOAD_DIR: /app/user_cache/workspace  # 上传文件目录
       ML_MODEL_DIR: /app/user_cache/ml_models  # 机器学习模型目录
       OFFICE_BASE_DIR: /app/user_cache/office  # Office 文件处理目录
@@ -137,8 +98,6 @@ services:  # 定义所有要启动的服务/容器
         condition: service_healthy  # 数据库健康后再启动
       data-mcp:  # 依赖 data-mcp
         condition: service_healthy  # data-mcp 健康后再启动
-      docx-use-mcp:  # 依赖 docx-use-mcp
-        condition: service_healthy  # docx-use-mcp 健康后再启动
     healthcheck:  # 主应用健康检查
       test:  # 健康检查命令
         - CMD  # 直接执行命令

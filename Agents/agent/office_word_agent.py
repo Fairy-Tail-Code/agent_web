@@ -5,7 +5,7 @@ from agno.agent import Agent
 from config.db_config import create_base_db
 from config.model_config import get_ai_model
 from tools.office_file_toolkit import OfficeFileToolkit
-from tools.mcp_tools.docx_use_mcp_tool import create_docx_use_mcp_tool
+from tools.office_docx_toolkit import OfficeDocxToolkit
 from tools.knowledge_query_tool import create_knowledge_query_tool, create_knowledge_list_tool
 
 OFFICE_WORD_SYSTEM_MESSAGE = """
@@ -31,7 +31,7 @@ def create_office_word_agent(agent_id: str) -> Agent:
         name="Word文档专家Agent",
         tools=[
             OfficeFileToolkit(),
-            create_docx_use_mcp_tool(),
+            OfficeDocxToolkit(),
             create_knowledge_query_tool(),
             create_knowledge_list_tool(),
         ],
