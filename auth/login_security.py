@@ -121,6 +121,15 @@ class LoginSecurity:
         for key in [f"email:{email}", f"ip:{ip}"]:
             self._reset(key)
 
+    def is_locked_out(self, email: str, ip: str) -> bool:
+        """
+        便捷方法：检查是否被锁定。
+
+        Returns:
+            True 表示已被锁定，False 表示可以继续尝试。
+        """
+        return not self.check(email, ip).allowed
+
     def _check_key(self, key: str) -> LoginAttemptResult:
         """检查单个 key 的锁定状态"""
         conn = sqlite3.connect(self._db_path)
