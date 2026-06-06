@@ -7,7 +7,7 @@ import os
 import zipfile
 from typing import Any, Dict, Optional, Tuple
 
-from lxml import etree
+from lxml import etree  # ty:ignore[unresolved-import]
 
 # Namespace definitions
 W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
@@ -102,7 +102,7 @@ def customize_footnote_formatting(doc, footnote_refs, format_symbols, start_numb
             if footnote_style:
                 try:
                     ref['paragraph'].style = footnote_style
-                except:
+                except Exception:
                     pass
             count += 1
     return count
@@ -354,7 +354,7 @@ def add_footnote_robust(
         else:
             # Use paragraph index
             paragraphs = doc_root.xpath('//w:p', namespaces=nsmap)
-            if paragraph_index >= len(paragraphs):
+            if paragraph_index is not None and paragraph_index >= len(paragraphs):
                 return False, f"Paragraph index {paragraph_index} out of range", None
             target_para = paragraphs[paragraph_index]
 
@@ -422,7 +422,7 @@ def add_footnote_robust(
         marker_rPr = etree.SubElement(marker_run, f'{{{W_NS}}}rPr')
         marker_rStyle = etree.SubElement(marker_rPr, f'{{{W_NS}}}rStyle')
         marker_rStyle.set(f'{{{W_NS}}}val', 'FootnoteReference')
-        marker_ref = etree.SubElement(marker_run, f'{{{W_NS}}}footnoteRef')
+        etree.SubElement(marker_run, f'{{{W_NS}}}footnoteRef')
 
         # Add space after marker
         space_run = etree.SubElement(fn_para, f'{{{W_NS}}}r')
@@ -825,7 +825,7 @@ def add_endnote(doc, paragraph_index: int, endnote_text: str):
     # Endnotes go at the very end
     doc.add_page_break()
     doc.add_heading("Endnotes", level=1)
-    endnote_para = doc.add_paragraph(f"† {endnote_text}")
+    doc.add_paragraph(f"† {endnote_text}")
 
     return doc
 

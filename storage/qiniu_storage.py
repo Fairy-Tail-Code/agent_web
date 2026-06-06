@@ -81,19 +81,20 @@ class QiniuStorage:
         return f"{prefix}/{safe_user_id}/{safe_filename}"
 
     def _calculate_expires(self, module: str) -> Optional[int]:
-        """Calculate expires time in seconds based on module configuration."""
-        # Check for hours first (office)
-        hours = self.config.expiration_hours(module)
-        if hours is not None:
-            return hours * 3600  # Convert hours to seconds
-
-        # Check for days (data)
+        """Calculate expires time in seconds based on module configuration.
+        Default is 30 days (2592000 seconds) if not configured."""
+        # Check for days first (all modules now use days)
         days = self.config.expiration_days(module)
         if days is not None:
             return days * 86400  # Convert days to seconds
 
-        # No expiration (knowledge)
-        return None
+        # Fallback: check for hours
+        hours = self.config.expiration_hours(module)
+        if hours is not None:
+            return hours * 3600  # Convert hours to seconds
+
+        # Default: 30 days (1 month)
+        return 30 * 86400
 
     def build_key_with_id(self, module: str, user_id: str, file_id: str, filename: str) -> str:
         prefix = self.config.path_prefix(module)
@@ -151,9 +152,8 @@ class QiniuStorage:
         ret, info = bucket.delete(self.config.bucket_name, key)
         return info.status_code == 200
 
-    def get_download_url(self, url: str, expires: int = 3600) -> str:
+    def get_download_url(self, url: str, expires: int = 2592000) -> str:
         if url.startswith(self.config.domain):
-            key = url.replace(self.config.domain + "/", "")
             return self.auth.private_download_url(url, expires=expires)
         return url
 

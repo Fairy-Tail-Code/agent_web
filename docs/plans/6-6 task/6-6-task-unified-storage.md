@@ -49,8 +49,8 @@
 ┌─────────────────────────────────────────────────────────────┐
 │                      业务层                                  │
 │  ┌─────────────────────────┐  ┌─────────────────────────┐  │
-│  │   Agents/server/data/           │  │  Agents/server/docx_use_mcp/  │  │
-│  │   DataFileManager         │  │  OfficeFileManager      │  │
+│  │   Agents/server/data/     │  │  Agents/server/docx_use_mcp/  │  │
+│  │   DataFileManager       │  │  OfficeFileManager      │  │
 │  └─────────────┬───────────┘  └──────────────┬──────────┘  │
 └───────────────┼──────────────────────────────┼──────────────┘
                 │                              │
@@ -506,8 +506,22 @@ class BaseFileManager(ABC):
 
     def _download_from_oss(self, oss_url: str, user_id: str) -> str:
         """从 OSS 下载文件到本地"""
-        # 实现：从 OSS URL 下载，恢复到本地路径
-        # ...
+        import httpx
+        user_dir = self._get_user_dir(user_id)
+        # 从 URL 中提取文件名
+        filename = oss_url.rsplit("/", 1)[-1] or "restored_file"
+        dest_path = user_dir / self._sanitize_filename(filename)
+
+        try:
+            with httpx.Client(timeout=60.0) as client:
+                resp = client.get(oss_url)
+                resp.raise_for_status()
+                with open(dest_path, "wb") as f:
+                    f.write(resp.content)
+            logger.info(f"OSS 文件已恢复到本地: {dest_path}")
+            return str(dest_path)
+        except Exception as e:
+            raise RuntimeError(f"从 OSS 下载文件失败: {oss_url}, {e}") from e
 
 
 # === 子类实现 ===
@@ -664,7 +678,7 @@ CREATE INDEX IF NOT EXISTS idx_storage_status ON storage.files(status);
 
 | 文件 | 改动 |
 |------|------|
-| `tools/office_file_toolkit.py` | `OfficeFileManager` 替代原有工具 |
+| `Agents/tools/office_file_toolkit.py` | `OfficeFileManager` 替代原有工具 |
 | `Agents/server/docx_use_mcp/docx_use_server/tools/document_tools.py` | 接受 user_id 参数，写入 user_id 隔离目录 |
 
 ### 4.4 公共改造
@@ -761,13 +775,13 @@ _train_executor = None
 async def lifespan(app: FastAPI):
     # 启动时初始化
     global _pool_executor, _train_executor
-    from server.data.data_process.task_pool import get_executor
+    from Agents.server.data.data_process.task_pool import get_executor
     from Agents.server.data.machine_learning.process_pool import get_train_executor
     get_executor()
     get_train_executor()
     yield
     # 关闭时清理
-    from server.data.data_process.task_pool import shutdown
+    from Agents.server.data.data_process.task_pool import shutdown
     from Agents.server.data.machine_learning.process_pool import shutdown_train_executor
     shutdown()
     shutdown_train_executor()
@@ -966,24 +980,23 @@ agent_web/
 │   ├── team/                 # Team 定义
 │   ├── tools/               # Toolkit 定义
 │   │   ├── office_file_toolkit.py  # 改造：使用 OfficeFileManager
-│   │   └── office_docx_toolkit.py # 新增（docx 合并后）
+│   │   ├── office_docx_toolkit.py  # 新增：从 docx_use_mcp 合并而来
+│   │   └── ...（mcp_tools/ 目录清理/删除）
 │   ├── knowledge/           # 知识库
 │   │   └── processor.py     # 改造：使用 KnowledgeFileManager
 │   └── server/
-│       ├── data/            # Data MCP 服务
-│       │   ├── data_process/
-│       │   │   └── data_preprocessing.py   # 改造：使用 DataFileManager
-│       │   ├── machine_learning/
-│       │   │   └── machine_learning_model.py  # 改造：使用 DataFileManager
-│       │   ├── data_process/task_pool.py  # 改造：线程池生命周期
-│       │   └── machine_learning/process_pool.py  # 改造：进程池生命周期
-│       └── docx_use_mcp/   # 待合并，不再作为独立 MCP
-│           └── docx_use_server/
+│       └── data/            # Data MCP 服务（保留，CPU 密集型独立服务）
+│           ├── data_process/
+│           │   ├── data_preprocessing.py   # 改造：使用 DataFileManager
+│           │   └── task_pool.py  # 改造：线程池生命周期
+│           └── machine_learning/
+│               ├── machine_learning_model.py  # 改造：使用 DataFileManager
+│               └── process_pool.py  # 改造：进程池生命周期
 │
 ├── api/                      # FastAPI 入口
 ├── auth/
 │   └── user_db.py          # 改造：添加 storage.files 建表
-├── storage/                 # OSS 存储能力
+├── storage/                 # 统一存储模块（含 OSS）
 │   ├── qiniu_storage.py    # 现有 OSS 封装
 │   ├── file_manager.py      # 新增：统一存储抽象层
 │   └── oss_sync_worker.py  # 新增：后台归档 Worker
@@ -992,6 +1005,8 @@ agent_web/
 └── config/                   # 配置
 ```
 
+**注意**：`Agents/server/docx_use_mcp/` 目录在 docx 合并任务（PROMPT.md 任务二）中处理，合并后只保留 `docx_use_server/` 逻辑层，MCP 入口文件删除。
+
 ---
 
 ## 8. 与其他任务的关系
@@ -999,7 +1014,6 @@ agent_web/
 - **本 plan** 是 `6-6-task-login-security.md` 的并行任务，同属 Phase 1 基础设施优化
 - **本 plan** 与 `docx 合并进 toolkit` 任务（见 PROMPT.md 任务二）共享 `storage/file_manager.py`
 - **代码清理**（`6-6-task-code-cleanup.md`）可与本任务并行
-- **本 plan** 是 `6-6-task-login-security.md` 的并行 plan，同属 Phase 1 基础设施优化
 
 ---
 

@@ -2,7 +2,7 @@
 Tests for knowledge base API endpoints.
 """
 
-import pytest
+import pytest  # ty:ignore[unresolved-import]
 from httpx import AsyncClient
 from unittest.mock import patch
 
@@ -157,10 +157,10 @@ class TestKnowledgeBaseAPIWithAuth:
         with patch("auth.permissions.get_current_user", return_value=mock_user):
             with patch("auth.knowledge_db.get_knowledge_base") as mock_get_kb:
                 # Mock a valid KB
-                from auth.knowledge_db import KnowledgeBaseRecord
+                from auth.kb_metadata import KnowledgeBaseRecord
                 from datetime import datetime
 
-                mock_get_kb.return_value = KnowledgeBaseRecord(
+                mock_get_kb.return_value = KnowledgeBaseRecord(  
                     kb_id="test-kb-id",
                     kb_name="Test KB",
                     kb_description="Test",
@@ -220,13 +220,13 @@ class TestFileUploadAPI:
         self, async_client: AsyncClient, mock_user
     ):
         """Test uploading a file with authentication."""
-        from auth.knowledge_db import KnowledgeBaseRecord
+        from auth.kb_metadata import KnowledgeBaseRecord
         from datetime import datetime
 
         with patch("auth.permissions.get_current_user", return_value=mock_user):
             with patch("auth.knowledge_db.get_knowledge_base") as mock_get_kb:
                 # Mock a valid KB owned by the user
-                mock_get_kb.return_value = KnowledgeBaseRecord(
+                mock_get_kb.return_value = KnowledgeBaseRecord(  
                     kb_id="test-kb-id",
                     kb_name="Test KB",
                     kb_description="Test",
@@ -265,12 +265,12 @@ class TestFileUploadAPI:
         self, async_client: AsyncClient, mock_user
     ):
         """Test uploading an unsupported file type."""
-        from auth.knowledge_db import KnowledgeBaseRecord
+        from auth.kb_metadata import KnowledgeBaseRecord
         from datetime import datetime
 
         with patch("auth.permissions.get_current_user", return_value=mock_user):
             with patch("auth.knowledge_db.get_knowledge_base") as mock_get_kb:
-                mock_get_kb.return_value = KnowledgeBaseRecord(
+                mock_get_kb.return_value = KnowledgeBaseRecord(  
                     kb_id="test-kb-id",
                     kb_name="Test KB",
                     kb_description="Test",
@@ -305,7 +305,7 @@ class TestFileUploadAPI:
     ):
         """Test that non-admin users cannot upload to official KBs."""
         from auth.model import CurrentUser
-        from auth.knowledge_db import KnowledgeBaseRecord
+        from auth.kb_metadata import KnowledgeBaseRecord
         from datetime import datetime
 
         non_admin_user = CurrentUser(
@@ -317,7 +317,7 @@ class TestFileUploadAPI:
         with patch("auth.permissions.get_current_user", return_value=non_admin_user):
             with patch("auth.knowledge_db.get_knowledge_base") as mock_get_kb:
                 # Mock an official KB
-                mock_get_kb.return_value = KnowledgeBaseRecord(
+                mock_get_kb.return_value = KnowledgeBaseRecord(  
                     kb_id="official-kb-id",
                     kb_name="Official KB",
                     kb_description="Official",
@@ -366,12 +366,12 @@ class TestDeleteOperations:
         self, async_client: AsyncClient, mock_user
     ):
         """Test deleting own knowledge base."""
-        from auth.knowledge_db import KnowledgeBaseRecord
+        from auth.kb_metadata import KnowledgeBaseRecord
         from datetime import datetime
 
         with patch("auth.permissions.get_current_user", return_value=mock_user):
             with patch("auth.knowledge_db.get_knowledge_base") as mock_get_kb:
-                mock_get_kb.return_value = KnowledgeBaseRecord(
+                mock_get_kb.return_value = KnowledgeBaseRecord(  
                     kb_id="test-kb-id",
                     kb_name="Test KB",
                     kb_description="Test",
@@ -406,13 +406,13 @@ class TestDeleteOperations:
         self, async_client: AsyncClient, mock_user
     ):
         """Test that users cannot delete other users' KBs."""
-        from auth.knowledge_db import KnowledgeBaseRecord
+        from auth.kb_metadata import KnowledgeBaseRecord
         from datetime import datetime
 
         with patch("auth.permissions.get_current_user", return_value=mock_user):
             with patch("auth.knowledge_db.get_knowledge_base") as mock_get_kb:
                 # Mock a KB owned by another user
-                mock_get_kb.return_value = KnowledgeBaseRecord(
+                mock_get_kb.return_value = KnowledgeBaseRecord(  
                     kb_id="other-users-kb",
                     kb_name="Other User's KB",
                     kb_description="Not yours",
@@ -445,13 +445,13 @@ class TestDeleteOperations:
         self, async_client: AsyncClient, mock_user
     ):
         """Test that non-admin users cannot delete official KBs."""
-        from auth.knowledge_db import KnowledgeBaseRecord
+        from auth.kb_metadata import KnowledgeBaseRecord
         from datetime import datetime
 
         with patch("auth.permissions.get_current_user", return_value=mock_user):
             with patch("auth.knowledge_db.get_knowledge_base") as mock_get_kb:
                 # Mock an official KB
-                mock_get_kb.return_value = KnowledgeBaseRecord(
+                mock_get_kb.return_value = KnowledgeBaseRecord(  
                     kb_id="official-kb",
                     kb_name="Official KB",
                     kb_description="Official",

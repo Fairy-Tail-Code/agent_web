@@ -4,8 +4,7 @@
 # 1. 检查/安装 uv（并尽量升级到较新版本）
 # 2. 检查/安装 Python（优先 3.12，否则回退已有的 python3）
 # 3. 使用 uv 安装 Python 依赖（优先 uv.lock，其次 requirements.txt）
-# 4. 运行 mcp_main.py 和 main.py
-# 5. 检查并启动 Docker 容器 metamcp-pg
+# 4. 运行 main.py
 
 set -euo pipefail
 
@@ -284,13 +283,6 @@ run_python_scripts() {
     exit 1
   fi
 
-  log_info "Running mcp_main.py ..."
-  if "${PYTHON_CMD}" mcp_main.py; then
-    log_ok "mcp_main.py executed successfully"
-  else
-    log_warn "mcp_main.py 执行异常，将继续执行后续步骤。"
-  fi
-
   log_info "Running main.py ..."
   if "${PYTHON_CMD}" main.py; then
     log_ok "main.py executed successfully"
@@ -307,31 +299,9 @@ manage_docker() {
     return 0
   fi
 
-  log_info "cd server/meta_mcp_main"
-  if ! cd server/meta_mcp_main; then
-    log_error "无法进入目录 server/meta_mcp_main"
-    return 1
-  fi
-
-  log_info "Checking if container 'metamcp-pg' exists..."
-  local container_id
-  container_id="$(docker ps -a --filter "name=^/metamcp-pg$" --quiet || true)"
-
-  if [[ -z "${container_id}" ]]; then
-    log_info "Container 'metamcp-pg' not found, running 'docker compose up -d'..."
-    if docker compose up -d; then
-      log_ok "docker compose up -d executed successfully, 'metamcp-pg' should be running."
-    else
-      log_error "docker compose up -d 执行失败，请手动检查。"
-    fi
-  else
-    log_info "Container 'metamcp-pg' exists, starting it..."
-    if docker start metamcp-pg; then
-      log_ok "Container 'metamcp-pg' started successfully."
-    else
-      log_error "启动容器 'metamcp-pg' 失败，请手动检查。"
-    fi
-  fi
+  # TODO: Update this section when the Docker compose setup for metamcp-pg is finalized.
+  # The previous code referenced a non-existent server/meta_mcp_main directory.
+  log_warn "Docker container management for metamcp-pg is not yet configured. Skipping."
 }
 
 install_deps_with_uv_safe() {

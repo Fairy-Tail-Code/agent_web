@@ -17,7 +17,7 @@ class OfficeMainEntrypointTests(unittest.TestCase):
         fake_team = object()
 
         fake_init_team = types.ModuleType("api.init_team")
-        fake_init_team.office_team = fake_team
+        fake_init_team.office_team = fake_team  # ty:ignore[unresolved-attribute]
 
         fake_agent_os_ctor = Mock()
 
@@ -32,10 +32,10 @@ class OfficeMainEntrypointTests(unittest.TestCase):
                 self.serve_kwargs = kwargs
 
         fake_agno_os = types.ModuleType("agno.os")
-        fake_agno_os.AgentOS = FakeAgentOS
+        fake_agno_os.AgentOS = FakeAgentOS  # ty:ignore[unresolved-attribute]
 
         fake_office_config = types.ModuleType("config.office_config")
-        fake_office_config.get_office_main_settings = Mock(
+        fake_office_config.get_office_main_settings = Mock(  # ty:ignore[unresolved-attribute]
             return_value={"host": "127.0.0.1", "port": 7788, "reload": False}
         )
 

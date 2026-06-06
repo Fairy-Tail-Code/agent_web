@@ -30,7 +30,7 @@ def create_knowledge_query_tool() -> Function:
         query: str,
         kb_names: Optional[List[str]] = None,
         max_results: int = 10,
-        current_user: CurrentUser = None,
+        current_user: Optional[CurrentUser] = None,
     ) -> str:
         """
         Search across user-accessible knowledge bases.
@@ -49,6 +49,8 @@ def create_knowledge_query_tool() -> Function:
             return "请提供有效的搜索查询。"
 
         # Get all accessible knowledge bases for the user
+        if current_user is None:
+            return "请先登录后再查询知识库。"
         accessible_kbs = list_accessible_knowledge_bases(
             user_id=current_user.user_id,
             include_official=True,
@@ -89,10 +91,10 @@ def create_knowledge_query_tool() -> Function:
                     all_results.append({
                         "kb_name": kb.kb_name,
                         "kb_id": kb.kb_id,
-                        "content": result.data.get("content", ""),
-                        "metadata": result.meta or {},
-                        "score": result.score or 0.0,
-                        "source": result.data.get("source", "unknown"),
+                        "content": result.data.get("content", ""),  # ty:ignore[unresolved-attribute]
+                        "metadata": result.meta or {},  # ty:ignore[unresolved-attribute]
+                        "score": result.score or 0.0,  # ty:ignore[unresolved-attribute]
+                        "source": result.data.get("source", "unknown"),  # ty:ignore[unresolved-attribute]
                     })
 
             except Exception as e:
@@ -134,7 +136,7 @@ def create_knowledge_list_tool() -> Function:
     """Create a tool for listing user-accessible knowledge bases."""
 
     async def list_user_knowledge_bases(
-        current_user: CurrentUser = None,
+        current_user: Optional[CurrentUser] = None,
     ) -> str:
         """
         List all knowledge bases accessible to the current user.
@@ -145,6 +147,8 @@ def create_knowledge_list_tool() -> Function:
         Returns:
             Formatted list of accessible knowledge bases.
         """
+        if current_user is None:
+            return "请先登录后再查看知识库。"
         accessible_kbs = list_accessible_knowledge_bases(
             user_id=current_user.user_id,
             include_official=True,

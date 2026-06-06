@@ -50,7 +50,13 @@ class OfficeFileToolkit(Toolkit):
         )
 
     def file_exists(self, path: str) -> ToolResult:
+        from config.office_config import get_office_paths
         resolved = Path(path).expanduser().resolve()
+        # Restrict to office directories
+        office_paths = get_office_paths()
+        allowed_dirs = [str(p.resolve()) for p in office_paths.values() if p.exists()]
+        if not any(str(resolved).startswith(d) for d in allowed_dirs):
+            return ToolResult(content=json.dumps({"error": "Path outside allowed directories"}))
         return ToolResult(
             content=json.dumps(
                 {

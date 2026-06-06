@@ -8,7 +8,7 @@ import psycopg
 from dataclasses import dataclass
 from typing import List, Optional
 from datetime import datetime, timezone
-from config.db_config import get_psycopg_db_url, Config
+from config.db_config import get_psycopg_db_url, DbConfig
 
 
 @dataclass
@@ -283,8 +283,8 @@ def drop_knowledge_tables(vector_table_name: str, content_table_name: str) -> No
     """Drop the vector and content tables for a knowledge base."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(f"DROP TABLE IF EXISTS {Config.DB_NAME}.{content_table_name}")
-            cur.execute(f"DROP TABLE IF EXISTS {Config.DB_NAME}.{vector_table_name}")
+            cur.execute(f"DROP TABLE IF EXISTS {DbConfig.DB_NAME}.{content_table_name}")
+            cur.execute(f"DROP TABLE IF EXISTS {DbConfig.DB_NAME}.{vector_table_name}")
             conn.commit()
 
 
@@ -334,7 +334,7 @@ def list_files_by_kb(
 ) -> List[KnowledgeFileRecord]:
     """List files in a knowledge base."""
     conditions = ["kb_id = %s"]
-    params = [kb_id]
+    params: list = [kb_id]
 
     if status is not None:
         conditions.append("processing_status = %s")
@@ -365,7 +365,7 @@ def update_file_status(
 ) -> Optional[KnowledgeFileRecord]:
     """Update file processing status."""
     update_fields = ["processing_status = %s"]
-    params = [status]
+    params: list = [status]
 
     if chunk_count is not None:
         update_fields.append("chunk_count = %s")

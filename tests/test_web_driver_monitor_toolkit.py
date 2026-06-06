@@ -12,7 +12,7 @@ if str(ROOT) not in sys.path:
 if str(AGNO_LIBS) not in sys.path:
     sys.path.insert(0, str(AGNO_LIBS))
 
-from tools.web_driver_monitor_toolkit import (  # noqa: E402
+from Agents.tools.web_driver_monitor_toolkit import (    # noqa: E402  # ty:ignore[unresolved-import]
     BROWSER_CURRENT_ROUND_STATE_KEY,
     BROWSER_SESSION_STATE_KEY,
     clear_browser_transient_state,

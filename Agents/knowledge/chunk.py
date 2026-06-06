@@ -38,7 +38,7 @@ try:
 except ImportError:
     AGENTIC_CHUNKER_AVAILABLE = False
 
-from knowledge.file_detector import (
+from Agents.knowledge.file_detector import (
     get_chunker_for_file,
 )
 
@@ -114,7 +114,7 @@ class Chunk:
             from config.model_config import get_ai_model
             embedder = self.kwargs.get("embedder") or get_ai_model()
             return SemanticChunking(
-                embedder=embedder,
+                embedder=embedder,  # ty:ignore[invalid-argument-type]
                 chunk_size=self.chunk_size,
                 similarity_threshold=self.kwargs.get("similarity_threshold", 0.5),
             )
@@ -146,14 +146,3 @@ class Chunk:
             return AgenticChunking(max_chunk_size=self.chunk_size)
         else:
             raise ValueError(f"Unknown chunking mode: {self.mode}")
-
-    @staticmethod
-    def get_chunker(mode: str = "document", **kwargs) -> Union[DocumentChunking, FixedSizeChunking]:
-        """
-        Static method to get a chunker (deprecated, use instance method instead).
-
-        This method is kept for backward compatibility.
-        Use `Chunk(file_path=..., mode='auto').get_chunker()` instead.
-        """
-        chunk = Chunk(mode=mode, **kwargs)
-        return chunk.get_chunker()

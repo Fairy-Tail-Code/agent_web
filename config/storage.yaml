@@ -10,6 +10,6 @@ path_prefixes:
   office: "office"
 
 expiration:
-  knowledge_days: null  # 不设置过期时间
-  data_days: 5  # 5天后过期
-  office_hours: 5  # 5小时后过期
+  knowledge_days: 30  # 30天后过期（1个月）
+  data_days: 30  # 30天后过期（1个月）
+  office_days: 30  # 30天后过期（1个月）

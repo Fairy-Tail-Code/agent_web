@@ -4,9 +4,9 @@ from agno.agent import Agent
 
 from config.db_config import create_base_db
 from config.model_config import get_ai_model
-from tools.office_file_toolkit import OfficeFileToolkit
-from tools.office_docx_toolkit import OfficeDocxToolkit
-from tools.knowledge_query_tool import create_knowledge_query_tool, create_knowledge_list_tool
+from Agents.tools.office_file_toolkit import OfficeFileToolkit
+from Agents.tools.office_docx_toolkit import OfficeDocxToolkit
+from Agents.tools.knowledge_query_tool import create_knowledge_query_tool, create_knowledge_list_tool
 
 OFFICE_WORD_SYSTEM_MESSAGE = """
 你是 Word文档专家Agent，负责生成和修改 `.docx` 办公文档。
@@ -40,9 +40,6 @@ def create_office_word_agent(agent_id: str) -> Agent:
     agent.description = "办公 Word 文档专家，负责读取、修改并交付 .docx 文件。"
     agent.model = get_ai_model()
     agent.db = create_base_db(agent_id)
-    # Note: Fixed knowledge binding removed to enable multi-tenant isolation.
-    # agent.search_knowledge = True  # Disabled, using tools instead
-    # agent.update_knowledge = True  # Disabled, no fixed knowledge to update
     agent.add_history_to_context = True
     agent.add_datetime_to_context = True
     agent.markdown = True

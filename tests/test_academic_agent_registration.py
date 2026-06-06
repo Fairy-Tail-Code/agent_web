@@ -24,8 +24,8 @@ class AcademicAgentRegistrationTests(unittest.TestCase):
         class FakeAcademicSearchToolkit:
             pass
 
-        fake_agno_agent.Agent = FakeAgent
-        fake_toolkit_module.AcademicSearchToolkit = FakeAcademicSearchToolkit
+        fake_agno_agent.Agent = FakeAgent  # ty:ignore[unresolved-attribute]
+        fake_toolkit_module.AcademicSearchToolkit = FakeAcademicSearchToolkit  # ty:ignore[unresolved-attribute]
 
         with patch.dict(
             sys.modules,
@@ -36,7 +36,8 @@ class AcademicAgentRegistrationTests(unittest.TestCase):
             clear=False,
         ):
             sys.modules.pop("agent.academic_agent", None)
-            from agent.academic_agent import create_academic_agent
+            from Agents.agent.academic_agent import create_academic_agent  # ty:ignore[unresolved-import]
+
 
         agent = create_academic_agent("academic_agent")
 
@@ -53,7 +54,7 @@ class AcademicAgentRegistrationTests(unittest.TestCase):
             def __init__(self, agent_id: str) -> None:
                 self.id = agent_id
 
-        fake_agno_agent.Agent = FakeAgent
+        fake_agno_agent.Agent = FakeAgent  # ty:ignore[unresolved-attribute]
 
         def _fake_factory(agent_id: str) -> FakeAgent:
             return FakeAgent(agent_id)
@@ -64,10 +65,10 @@ class AcademicAgentRegistrationTests(unittest.TestCase):
             return mod
 
         fake_utils = types.ModuleType("api.utils")
-        fake_utils.set_default_config_to_agent = Mock()
+        fake_utils.set_default_config_to_agent = Mock()  # ty:ignore[unresolved-attribute]
 
         fake_read_agent = types.ModuleType("agent_manage.read_agent")
-        fake_read_agent.read_agent = Mock(return_value=[])
+        fake_read_agent.read_agent = Mock(return_value=[])  # ty:ignore[unresolved-attribute]
 
         with patch.dict(
             sys.modules,

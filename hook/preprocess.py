@@ -91,7 +91,7 @@ def preprocess_hook(run_input: RunInput) -> dict:
             )
 
             try:
-                local_path = fm.save_local(user_id, file.content, file_name)
+                local_path = fm.save_local(user_id, file.content, file_name)  # ty:ignore[invalid-argument-type]
                 fm.register(
                     user_id, local_path,
                     filename=file_name,
@@ -124,7 +124,7 @@ def preprocess_hook(run_input: RunInput) -> dict:
             dest_path = target_dir / file_name
             try:
                 with open(dest_path, "wb") as f:
-                    f.write(file.content)
+                    f.write(file.content)  # ty:ignore[invalid-argument-type]
                 logger.info(f"文件本地保存成功 | user_id={user_id} | path={dest_path}")
             except Exception as e:
                 logger.error(f"文件本地保存失败 | user_id={user_id} | file={file_name} | err={str(e)}")

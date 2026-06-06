@@ -12,8 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from Agents.server.repo_monitor_mcp.scheduler import RepoMonitorScheduler
-from Agents.server.repo_monitor_mcp.storage import RepoMonitorStorage
+from Agents.server.repo_monitor_mcp.scheduler import RepoMonitorScheduler  # ty:ignore[unresolved-import]  # noqa: E402
+
+from Agents.server.repo_monitor_mcp.storage import RepoMonitorStorage  # ty:ignore[unresolved-import]  # noqa: E402
+
 
 
 class RepoMonitorStorageTests(unittest.TestCase):
@@ -104,9 +106,9 @@ class RepoMonitorAgentRegistrationTests(unittest.TestCase):
         class FakeRepoMonitorMcpTools:
             pass
 
-        fake_agno_agent.Agent = FakeAgent
-        fake_git_diff_module.GitDiffToolkit = FakeGitDiffToolkit
-        fake_mcp_module.create_repo_monitor_mcp_tools = lambda: FakeRepoMonitorMcpTools()
+        fake_agno_agent.Agent = FakeAgent  # ty:ignore[unresolved-attribute]
+        fake_git_diff_module.GitDiffToolkit = FakeGitDiffToolkit  # ty:ignore[unresolved-attribute]
+        fake_mcp_module.create_repo_monitor_mcp_tools = lambda: FakeRepoMonitorMcpTools()  # ty:ignore[unresolved-attribute]
 
         with patch.dict(
             sys.modules,
@@ -118,7 +120,8 @@ class RepoMonitorAgentRegistrationTests(unittest.TestCase):
             clear=False,
         ):
             sys.modules.pop("agent.repo_monitor_agent", None)
-            from agent.repo_monitor_agent import create_repo_monitor_agent
+            from Agents.agent.repo_monitor_agent import create_repo_monitor_agent  # ty:ignore[unresolved-import]
+
 
         agent = create_repo_monitor_agent("repo_monitor_agent")
         self.assertEqual(agent.id, "repo_monitor_agent")
@@ -137,8 +140,8 @@ class RepoMonitorAgentRegistrationTests(unittest.TestCase):
         class FakeComputerTools:
             pass
 
-        fake_agno_agent.Agent = FakeAgent
-        fake_mcp_module.create_computer_mcp_tools = lambda: FakeComputerTools()
+        fake_agno_agent.Agent = FakeAgent  # ty:ignore[unresolved-attribute]
+        fake_mcp_module.create_computer_mcp_tools = lambda: FakeComputerTools()  # ty:ignore[unresolved-attribute]
 
         with patch.dict(
             sys.modules,
@@ -149,7 +152,8 @@ class RepoMonitorAgentRegistrationTests(unittest.TestCase):
             clear=False,
         ):
             sys.modules.pop("agent.desktop_control_agent", None)
-            from agent.desktop_control_agent import create_desktop_control_agent
+            from Agents.agent.desktop_control_agent import create_desktop_control_agent  # ty:ignore[unresolved-import]
+
 
         agent = create_desktop_control_agent("desktop_control_agent")
         self.assertEqual(agent.id, "desktop_control_agent")
@@ -164,7 +168,7 @@ class RepoMonitorAgentRegistrationTests(unittest.TestCase):
             def __init__(self, agent_id: str) -> None:
                 self.id = agent_id
 
-        fake_agno_agent.Agent = FakeAgent
+        fake_agno_agent.Agent = FakeAgent  # ty:ignore[unresolved-attribute]
 
         def _fake_factory(agent_id: str) -> FakeAgent:
             return FakeAgent(agent_id)
@@ -175,10 +179,10 @@ class RepoMonitorAgentRegistrationTests(unittest.TestCase):
             return mod
 
         fake_utils = types.ModuleType("api.utils")
-        fake_utils.set_default_config_to_agent = Mock()
+        fake_utils.set_default_config_to_agent = Mock()  # ty:ignore[unresolved-attribute]
 
         fake_read_agent = types.ModuleType("agent_manage.read_agent")
-        fake_read_agent.read_agent = Mock(return_value=[])
+        fake_read_agent.read_agent = Mock(return_value=[])  # ty:ignore[unresolved-attribute]
 
         with patch.dict(
             sys.modules,

@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from agno.db.postgres import PostgresDb
@@ -15,7 +16,7 @@ from config.model_config import get_siliconflow_embedder
 load_dotenv()
 
 
-class Config:
+class DbConfig:
     """应用配置管理类"""
 
     # Vector DB 配置
@@ -42,11 +43,11 @@ class Config:
 def _build_base_db_url(driver: str) -> str:
     return "{}://{}{}@{}:{}/{}".format(
         driver,
-        Config.DB_USER,
-        f":{Config.DB_PASSWORD}" if Config.DB_PASSWORD else "",
-        Config.DB_HOST,
-        Config.DB_PORT,
-        Config.DB_NAME,
+        DbConfig.DB_USER,
+        f":{DbConfig.DB_PASSWORD}" if DbConfig.DB_PASSWORD else "",
+        DbConfig.DB_HOST,
+        DbConfig.DB_PORT,
+        DbConfig.DB_NAME,
     )
 
 
@@ -54,7 +55,7 @@ def _with_application_name(base_url: str, id: str | None = None) -> str:
     parsed = urlparse(base_url)
     query_params = parse_qs(parsed.query)
 
-    app_name = f"{Config.APPLICATION_NAME}-{id or 'unknown'}"
+    app_name = f"{DbConfig.APPLICATION_NAME}-{id or 'unknown'}"
     query_params["application_name"] = [app_name]
 
     return urlunparse(
@@ -76,7 +77,7 @@ def get_psycopg_db_url(id: str | None = None) -> str:
     psycopg accepts ``postgresql://`` URIs, but not SQLAlchemy dialect aliases
     such as ``postgresql+psycopg://``.
     """
-    driver = Config.DB_DRIVER.split("+", 1)[0]
+    driver = DbConfig.DB_DRIVER.split("+", 1)[0]
     if driver == "postgres":
         driver = "postgresql"
     return _with_application_name(_build_base_db_url(driver), id=id)
@@ -97,14 +98,14 @@ def create_knowledge_vector(id: str, **kwargs) -> VectorDb:
     # 允许调用方显式覆盖 table_name，避免和默认命名重复传参
     table_name = kwargs.pop("table_name", f"{id}_knowledge_vectors")
 
-    if Config.VECTOR_DB_TYPE.lower() == "lightrag":
+    if DbConfig.VECTOR_DB_TYPE.lower() == "lightrag":
         from agno.vectordb.lightrag import LightRag
-        return LightRag(server_url=os.getenv("LIGHTRAG_SERVER_URL"), **kwargs)
+        return LightRag(server_url=os.getenv("LIGHTRAG_SERVER_URL", ""), **kwargs)
     else:
         # 默认使用PgVector
         from agno.knowledge.reranker.cohere import CohereReranker
         return PgVector(table_name=table_name,
-                        schema=Config.DB_NAME,
+                        schema=DbConfig.DB_NAME,
                         db_url=get_db_url(id=id),
                         search_type=SearchType.vector,
                         embedder=get_siliconflow_embedder(),
@@ -116,7 +117,7 @@ def create_knowledge_vector(id: str, **kwargs) -> VectorDb:
 
 
 def create_knowledge(id: str, name: str, description: str, max_results: int = 10) -> Knowledge:
-    logger.debug(f"Creating knowledge base: id:{id} name:{name} with schema: {Config.DB_NAME}")
+    logger.debug(f"Creating knowledge base: id:{id} name:{name} with schema: {DbConfig.DB_NAME}")
     vector_db = create_knowledge_vector(id=id)
     knowledge = Knowledge(
         name=name,
@@ -152,7 +153,7 @@ def create_base_db(id: str) -> PostgresDb:
 
     db_instance = PostgresDb(
         id=id,
-        db_schema=Config.DB_NAME,
+        db_schema=DbConfig.DB_NAME,
         db_url=get_db_url(id=id),
         session_table=f"{id}_sessions",
         memory_table=f"{id}_memories",
@@ -180,7 +181,7 @@ def create_knowledge_db(id: str) -> PostgresDb:
 
     db_instance = PostgresDb(
         id=id,
-        db_schema=Config.DB_NAME,
+        db_schema=DbConfig.DB_NAME,
         db_url=get_db_url(id=f"{id}_knowledge"),
         knowledge_table=f"{id}_knowledge_contents",
     )
@@ -208,7 +209,7 @@ def create_tracing_db(id: str = "tracing") -> PostgresDb:
 
     db_instance = PostgresDb(
         id=id,
-        db_schema=Config.DB_NAME,
+        db_schema=DbConfig.DB_NAME,
         db_url=get_db_url(id=id),
         # Tracing 表使用默认表名，不添加前缀
         # 这样所有 Agent/Team 的 traces 都存储在同一个表中
@@ -221,7 +222,7 @@ def create_tracing_db(id: str = "tracing") -> PostgresDb:
     return db_instance
 
 
-def get_db_url(id: str = None) -> str:
+def get_db_url(id: Optional[str] = None) -> str:
     """
     生成数据库连接URL，包含application_name参数
 
@@ -231,4 +232,4 @@ def get_db_url(id: str = None) -> str:
     Returns:
         包含application_name参数的数据库连接URL
     """
-    return _with_application_name(_build_base_db_url(Config.DB_DRIVER), id=id)
+    return _with_application_name(_build_base_db_url(DbConfig.DB_DRIVER), id=id)

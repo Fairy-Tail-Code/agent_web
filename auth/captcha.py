@@ -8,6 +8,7 @@ import os
 
 import httpx
 from dotenv import load_dotenv
+from agno.utils.log import logger
 
 load_dotenv()
 
@@ -33,8 +34,9 @@ async def verify_turnstile(token: str) -> bool:
         return False
 
     if not TURNSTILE_SECRET_KEY:
-        # 未配置 secret key，跳过验证（开发环境）
-        return True
+        # 未配置 secret key 且 CAPTCHA 已启用，拒绝验证
+        logger.warning("CAPTCHA_ENABLED=true but TURNSTILE_SECRET_KEY is not set. Rejecting verification.")
+        return False
 
     try:
         async with httpx.AsyncClient() as client:
@@ -48,6 +50,7 @@ async def verify_turnstile(token: str) -> bool:
             )
             result = resp.json()
             return result.get("success", False)
-    except Exception:
-        # 网络异常，放行（避免因 Turnstile 服务不可用而阻断登录）
-        return True
+    except Exception as e:
+        # 网络异常，拒绝验证（避免因 Turnstile 服务不可用而绕过保护）
+        logger.warning(f"Turnstile verification request failed: {e}")
+        return False

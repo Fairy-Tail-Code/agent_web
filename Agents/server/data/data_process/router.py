@@ -1,5 +1,6 @@
 # todo 运行时自动执行一次DB初始化并打上日志，和Agent manger保持一致
 import asyncio
+import os
 from typing import List, Optional, Tuple, Union
 
 from fastapi import APIRouter, HTTPException, Request
@@ -26,6 +27,8 @@ from Agents.server.data.data_process.data_preprocessing import (
 from Agents.server.data.data_process.task_pool import submit_task
 
 processing_router = APIRouter(prefix="/processing", tags=["Processing"])
+
+_PREPROCESSING_TIMEOUT = int(os.getenv("PREPROCESSING_TIMEOUT", "300"))
 
 
 class BaseProcessingRequest(BaseModel):
@@ -91,7 +94,18 @@ async def _run_and_summarize(func, *args, **kwargs):
     """
     try:
         future = submit_task(func, *args, **kwargs)
-        df = await asyncio.wrap_future(future)
+        df = await asyncio.wait_for(asyncio.wrap_future(future), timeout=_PREPROCESSING_TIMEOUT)
+    except asyncio.TimeoutError:
+        raise HTTPException(
+            status_code=408,
+            detail=f"操作超时（{_PREPROCESSING_TIMEOUT}秒）",
+        ) from None
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except HTTPException:
+        raise
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 

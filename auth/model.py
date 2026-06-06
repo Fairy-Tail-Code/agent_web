@@ -2,17 +2,6 @@ from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True)
-class TokenPayload:
-    """Historical JWT payload model kept for backward compatibility."""
-    sub: str
-    email: str
-    role: str
-    scopes: list[str] = field(default_factory=list)
-    issued_at: int = 0
-    expires_at: int = 0
-
-
-@dataclass(frozen=True)
 class CurrentUser:
     """Written to request.state by AuthMiddleware."""
     user_id: str

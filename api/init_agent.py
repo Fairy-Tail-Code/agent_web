@@ -1,15 +1,12 @@
 from agno.agent import Agent
 
 from Agents.agent.data_agent import create_data_agent
-from Agents.agent.docx_use_agent import create_docx_use_agent
 from api import utils
 
 data_agent = create_data_agent(agent_id="data_agent")
-docx_use_agent = create_docx_use_agent(agent_id="docx_use_agent")
 
 all_agents = [
     data_agent,
-    docx_use_agent,
 ]
 
 for agent in list(all_agents):

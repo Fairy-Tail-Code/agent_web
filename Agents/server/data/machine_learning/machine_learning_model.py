@@ -212,7 +212,7 @@ def _maybe_bayes_search(
     """
     try:
         from sklearn.model_selection import StratifiedKFold
-        from skopt import BayesSearchCV  # type: ignore[import]
+        from skopt import BayesSearchCV  
     except ImportError:
         # 未安装 skopt，直接返回原模型
         return model, None
@@ -314,7 +314,7 @@ def train_model_once(
             y_test,
             y_pred,
             labels=labels,
-            target_names=[str(l) for l in labels],
+            target_names=[str(label) for label in labels],
         )
         metrics = {"accuracy": acc, "classification_report": report}
 

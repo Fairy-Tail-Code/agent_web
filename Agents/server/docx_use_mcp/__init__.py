@@ -1,4 +1,1 @@
-"""Office Word MCP Server package entry point."""
-from Agents.server.docx_use_mcp.docx_use_server.main import run_server
-
-__all__ = ["run_server"]
+# Docx logic package - MCP entry points removed, only docx_use_server logic layer remains.

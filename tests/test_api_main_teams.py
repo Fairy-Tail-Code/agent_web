@@ -22,10 +22,10 @@ class ApiMainTeamsTests(unittest.TestCase):
             def instrument(self, **kwargs) -> None:
                 self.instrument_kwargs = kwargs
 
-        fake_openinference_agno.AgnoInstrumentor = FakeAgnoInstrumentor
+        fake_openinference_agno.AgnoInstrumentor = FakeAgnoInstrumentor  # ty:ignore[unresolved-attribute]
 
         fake_otlp_module = types.ModuleType("opentelemetry.exporter.otlp.proto.http.trace_exporter")
-        fake_otlp_module.OTLPSpanExporter = Mock(return_value="exporter")
+        fake_otlp_module.OTLPSpanExporter = Mock(return_value="exporter")  # ty:ignore[unresolved-attribute]
 
         fake_trace_module = types.ModuleType("opentelemetry.sdk.trace")
 
@@ -36,48 +36,48 @@ class ApiMainTeamsTests(unittest.TestCase):
             def add_span_processor(self, processor) -> None:
                 self.processors.append(processor)
 
-        fake_trace_module.TracerProvider = FakeTracerProvider
+        fake_trace_module.TracerProvider = FakeTracerProvider  # ty:ignore[unresolved-attribute]
 
         fake_trace_export_module = types.ModuleType("opentelemetry.sdk.trace.export")
-        fake_trace_export_module.SimpleSpanProcessor = Mock(side_effect=lambda exporter: ("processor", exporter))
+        fake_trace_export_module.SimpleSpanProcessor = Mock(side_effect=lambda exporter: ("processor", exporter))  # ty:ignore[unresolved-attribute]
 
         fake_monitor_module = types.ModuleType("api.monitor")
-        fake_monitor_module.setup_prometheus_monitoring = Mock()
+        fake_monitor_module.setup_prometheus_monitoring = Mock()  # ty:ignore[unresolved-attribute]
 
         fake_manage_module = types.ModuleType("api.manage")
-        fake_manage_module.manage_router = object()
+        fake_manage_module.manage_router = object()  # ty:ignore[unresolved-attribute]
 
         fake_dotenv = types.ModuleType("dotenv")
-        fake_dotenv.load_dotenv = Mock()
+        fake_dotenv.load_dotenv = Mock()  # ty:ignore[unresolved-attribute]
 
         fake_db_config = types.ModuleType("config.db_config")
-        fake_db_config.create_tracing_db = Mock(return_value="tracing-db")
+        fake_db_config.create_tracing_db = Mock(return_value="tracing-db")  # ty:ignore[unresolved-attribute]
 
         fake_model_config = types.ModuleType("config.model_config")
 
         fake_registry_module = types.ModuleType("api.registry")
-        fake_registry_module.registry = "registry"
+        fake_registry_module.registry = "registry"  # ty:ignore[unresolved-attribute]
 
         fake_init_agent = types.ModuleType("api.init_agent")
         fake_agent = types.SimpleNamespace(id="agent-a", db=types.SimpleNamespace(id="agent-a"))
-        fake_init_agent.all_agents = [fake_agent]
+        fake_init_agent.all_agents = [fake_agent]  # ty:ignore[unresolved-attribute]
 
         fake_init_workflow = types.ModuleType("api.init_workflow")
         fake_workflow = types.SimpleNamespace(id="workflow-a", db=types.SimpleNamespace(id="workflow-a"))
-        fake_init_workflow.all_workflows = [fake_workflow]
+        fake_init_workflow.all_workflows = [fake_workflow]  # ty:ignore[unresolved-attribute]
 
         fake_init_team = types.ModuleType("api.init_team")
         fake_team = types.SimpleNamespace(id="office_team", db=types.SimpleNamespace(id="office_team"))
-        fake_init_team.all_teams = [fake_team]
+        fake_init_team.all_teams = [fake_team]  # ty:ignore[unresolved-attribute]
 
         fake_agno_db = types.ModuleType("agno.db")
-        fake_agno_db.BaseDb = object
+        fake_agno_db.BaseDb = object  # ty:ignore[unresolved-attribute]
 
         fake_agno_sqlite = types.ModuleType("agno.db.sqlite")
-        fake_agno_sqlite.SqliteDb = object
+        fake_agno_sqlite.SqliteDb = object  # ty:ignore[unresolved-attribute]
 
         fake_agno_utils_log = types.ModuleType("agno.utils.log")
-        fake_agno_utils_log.log_info = Mock()
+        fake_agno_utils_log.log_info = Mock()  # ty:ignore[unresolved-attribute]
 
         fake_agent_os_ctor = Mock()
 
@@ -88,11 +88,11 @@ class ApiMainTeamsTests(unittest.TestCase):
 
             def get_app(self):
                 app = types.SimpleNamespace()
-                app.include_router = Mock()
+                app.include_router = Mock()  
                 return app
 
         fake_agno_os = types.ModuleType("agno.os")
-        fake_agno_os.AgentOS = FakeAgentOS
+        fake_agno_os.AgentOS = FakeAgentOS  # ty:ignore[unresolved-attribute]
 
         with patch.dict(
             sys.modules,

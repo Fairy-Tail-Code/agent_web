@@ -7,6 +7,7 @@ Uses asyncio for background task processing.
 
 import asyncio
 import logging
+import os
 from typing import Set, Optional
 from pathlib import Path
 from urllib.parse import urlparse
@@ -26,7 +27,7 @@ from config.db_config import create_knowledge
 logger = logging.getLogger(__name__)
 
 # Temporary directory for processing downloaded files
-TEMP_PROCESSING_DIR = Path("./user_cache/knowledge_temp")
+TEMP_PROCESSING_DIR = Path(os.getenv("KNOWLEDGE_TEMP_DIR", "./user_cache/knowledge_temp"))
 TEMP_PROCESSING_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -185,7 +186,7 @@ class FileProcessor:
 
             # Use FileDetector to automatically select reader and chunker based on file type
             # This ensures optimal processing for each file type without user selection
-            from knowledge.file_detector import get_reader_and_chunker
+            from Agents.knowledge.reader import get_reader_and_chunker
             reader, chunker = get_reader_and_chunker(
                 file_path,
                 chunk_size=kb.chunk_size,
@@ -225,12 +226,12 @@ class FileProcessor:
         """Count chunks in a vector table."""
         try:
             import psycopg
-            from config.db_config import Config, get_psycopg_db_url
+            from config.db_config import DbConfig, get_psycopg_db_url
 
             with psycopg.connect(get_psycopg_db_url(id="knowledge-processor")) as conn:
                 with conn.cursor() as cur:
-                    cur.execute(f"SELECT COUNT(*) FROM {Config.DB_NAME}.{vector_table_name}")
-                    count = cur.fetchone()[0]
+                    cur.execute(f"SELECT COUNT(*) FROM {DbConfig.DB_NAME}.{vector_table_name}")  # ty:ignore[no-matching-overload]
+                    count = cur.fetchone()[0]  # ty:ignore[not-subscriptable]
                     return count
         except Exception as e:
             logger.error(f"Failed to count chunks in {vector_table_name}: {e}")
@@ -238,14 +239,14 @@ class FileProcessor:
 
 
 # Global file processor instance
-_file_processor: FileProcessor = None
+_file_processor: Optional[FileProcessor] = None
 
 
 def get_file_processor() -> FileProcessor:
     """Get global file processor instance."""
     global _file_processor
     if _file_processor is None:
-        _file_processor = FileProcessor(max_workers=3)
+        _file_processor = FileProcessor(max_workers=int(os.getenv("KNOWLEDGE_PROCESSOR_WORKERS", "3")))
     return _file_processor
 
 

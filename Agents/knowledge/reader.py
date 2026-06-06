@@ -8,10 +8,12 @@ reader based on file type. Users cannot override this selection.
 from pathlib import Path
 from typing import Optional, Union
 
+from agno.knowledge.chunking.strategy import ChunkingStrategy
+
 
 def get_reader(
     file_path: Optional[Union[str, Path]] = None,
-    chunker: Optional["ChunkingStrategy"] = None,
+    chunker: Optional[ChunkingStrategy] = None,
     url: Optional[str] = None,
 ):
     """
@@ -31,7 +33,7 @@ def get_reader(
     Raises:
         ValueError: If neither file_path nor url is provided
     """
-    from knowledge.file_detector import FileDetector, get_reader_for_file
+    from Agents.knowledge.file_detector import FileDetector, get_reader_for_file
 
     if url:
         # For URLs, use URL-based reader detection
@@ -65,7 +67,7 @@ def get_reader_and_chunker(
     Returns:
         Tuple of (reader, chunker)
     """
-    from knowledge.file_detector import get_reader_and_chunker as get_both
+    from Agents.knowledge.file_detector import get_reader_and_chunker as get_both
 
     reader, chunker, file_type = get_both(file_path, chunk_size, overlap, **kwargs)
     return reader, chunker

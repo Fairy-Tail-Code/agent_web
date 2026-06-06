@@ -112,7 +112,7 @@ async def convert_to_pdf(filename: str, output_filename: Optional[str] = None) -
         if system == "Windows":
             # On Windows, try docx2pdf which uses Microsoft Word
             try:
-                from docx2pdf import convert
+                from docx2pdf import convert  # ty:ignore[unresolved-import]
                 convert(filename, output_filename)
                 return f"Document successfully converted to PDF: {output_filename}"
             except (ImportError, Exception) as e:
@@ -164,7 +164,7 @@ async def convert_to_pdf(filename: str, output_filename: Optional[str] = None) -
 
             # --- Attempt 2: docx2pdf (Fallback) ---
             try:
-                from docx2pdf import convert
+                from docx2pdf import convert  # ty:ignore[unresolved-import]
                 convert(filename, output_filename)
                 if os.path.exists(output_filename) and os.path.getsize(output_filename) > 0:
                     return f"Document successfully converted to PDF via docx2pdf: {output_filename}"

@@ -77,7 +77,12 @@ def build_office_output_path(file_name: str, kind: str) -> Path:
 def resolve_office_input_path(file_name: str) -> Path:
     path = Path(file_name).expanduser()
     if path.is_absolute():
-        return path.resolve()
+        # Only allow absolute paths under configured office directories
+        resolved = path.resolve()
+        allowed_roots = [get_office_paths()["input_dir"].resolve(), get_office_paths()["output_dir"].resolve()]
+        if not any(str(resolved).startswith(str(root)) for root in allowed_roots):
+            raise ValueError(f"Absolute path not allowed: {file_name}")
+        return resolved
     paths = ensure_office_dirs()
     return (paths["input_dir"] / path.name).resolve()
 
