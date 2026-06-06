@@ -5,11 +5,11 @@ import asyncio
 
 from docx import Document
 
-from server.docx_use_mcp.docx_use_server.tools.content_tools import (
+from Agents.server.docx_use_mcp.docx_use_server.tools.content_tools import (
     add_heading,
     add_paragraph,
 )
-from server.docx_use_mcp.docx_use_server.tools.document_tools import create_document
+from Agents.server.docx_use_mcp.docx_use_server.tools.document_tools import create_document
 
 
 async def test_formatting():

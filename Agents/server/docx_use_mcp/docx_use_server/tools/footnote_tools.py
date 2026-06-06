@@ -15,7 +15,7 @@ from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
 from docx.shared import Pt
 
-from server.docx_use_mcp.docx_use_server.core.footnotes import (
+from Agents.server.docx_use_mcp.docx_use_server.core.footnotes import (
     add_footnote_robust,
     customize_footnote_formatting,
     delete_footnote_robust,

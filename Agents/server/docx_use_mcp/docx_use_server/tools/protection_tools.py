@@ -13,7 +13,7 @@ from typing import List, Optional
 import msoffcrypto
 from docx import Document
 
-from server.docx_use_mcp.docx_use_server.core.protection import (
+from Agents.server.docx_use_mcp.docx_use_server.core.protection import (
     add_protection_info,
     create_signature_info,
     verify_document_protection,

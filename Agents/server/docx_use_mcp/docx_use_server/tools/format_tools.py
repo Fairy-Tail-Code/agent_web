@@ -11,8 +11,8 @@ from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
 from docx.shared import Pt, RGBColor
 
-from server.docx_use_mcp.docx_use_server.core.styles import create_style
-from server.docx_use_mcp.docx_use_server.core.tables import (
+from Agents.server.docx_use_mcp.docx_use_server.core.styles import create_style
+from Agents.server.docx_use_mcp.docx_use_server.core.tables import (
     apply_alternating_row_shading,
     apply_table_style,
     auto_fit_table,
@@ -28,7 +28,7 @@ from server.docx_use_mcp.docx_use_server.core.tables import (
     set_column_widths,
     set_table_alignment,
 )
-from server.docx_use_mcp.docx_use_server.core.tables import (
+from Agents.server.docx_use_mcp.docx_use_server.core.tables import (
     set_table_width as set_table_width_func,
 )
 from Agents.server.docx_use_mcp.docx_use_server.utils import (

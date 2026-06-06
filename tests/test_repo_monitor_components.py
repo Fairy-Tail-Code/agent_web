@@ -12,8 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from server.repo_monitor_mcp.scheduler import RepoMonitorScheduler
-from server.repo_monitor_mcp.storage import RepoMonitorStorage
+from Agents.server.repo_monitor_mcp.scheduler import RepoMonitorScheduler
+from Agents.server.repo_monitor_mcp.storage import RepoMonitorStorage
 
 
 class RepoMonitorStorageTests(unittest.TestCase):

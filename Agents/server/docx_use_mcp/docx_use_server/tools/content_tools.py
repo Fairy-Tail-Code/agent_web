@@ -10,7 +10,7 @@ from typing import List, Optional
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 
-from server.docx_use_mcp.docx_use_server.core.styles import (
+from Agents.server.docx_use_mcp.docx_use_server.core.styles import (
     ensure_heading_style,
 )
 from Agents.server.docx_use_mcp.docx_use_server.utils import (

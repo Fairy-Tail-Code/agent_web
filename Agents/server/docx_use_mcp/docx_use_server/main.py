@@ -17,7 +17,7 @@ os.environ.setdefault('FASTMCP_LOG_LEVEL', 'INFO')
 from fastmcp import FastMCP
 from mcp.types import ToolAnnotations
 
-from server.docx_use_mcp.docx_use_server.tools import (
+from Agents.server.docx_use_mcp.docx_use_server.tools import (
     comment_tools,
     content_tools,
     document_tools,
@@ -26,7 +26,7 @@ from server.docx_use_mcp.docx_use_server.tools import (
     format_tools,
     protection_tools,
 )
-from server.docx_use_mcp.docx_use_server.tools.content_tools import (
+from Agents.server.docx_use_mcp.docx_use_server.tools.content_tools import (
     replace_block_between_manual_anchors_tool,
     replace_paragraph_block_below_header_tool,
 )

@@ -5,8 +5,8 @@ from typing import List, Optional, Tuple, Union
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
-from server.data.request_context import resolve_request_user_id
-from server.data.data_process.data_preprocessing import (
+from Agents.server.data.request_context import resolve_request_user_id
+from Agents.server.data.data_process.data_preprocessing import (
     cap_outliers_iqr,
     drop_null_columns,
     drop_null_rows,
@@ -23,7 +23,7 @@ from server.data.data_process.data_preprocessing import (
     sample_rows,
     standard_scaling,
 )
-from server.data.data_process.task_pool import submit_task
+from Agents.server.data.data_process.task_pool import submit_task
 
 processing_router = APIRouter(prefix="/processing", tags=["Processing"])
 

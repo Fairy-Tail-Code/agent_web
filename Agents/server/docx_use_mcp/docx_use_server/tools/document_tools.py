@@ -7,7 +7,7 @@ from typing import List, Optional
 
 from docx import Document
 
-from server.docx_use_mcp.docx_use_server.core.styles import (
+from Agents.server.docx_use_mcp.docx_use_server.core.styles import (
     ensure_heading_style,
     ensure_table_style,
 )
@@ -154,7 +154,7 @@ async def merge_documents(target_filename: str, source_filenames: List[str], add
         source_filenames: List of paths to source documents to merge
         add_page_breaks: If True, add page breaks between documents
     """
-    from server.docx_use_mcp.docx_use_server.core.tables import copy_table
+    from Agents.server.docx_use_mcp.docx_use_server.core.tables import copy_table
 
     target_filename = ensure_docx_extension(target_filename)
 

@@ -9,7 +9,7 @@ import os
 
 from docx import Document
 
-from server.docx_use_mcp.docx_use_server.core.comments import (
+from Agents.server.docx_use_mcp.docx_use_server.core.comments import (
     extract_all_comments,
     filter_comments_by_author,
     get_comments_for_paragraph,
@@ -146,7 +146,7 @@ async def get_comments_for_paragraph(filename: str, paragraph_index: int) -> str
         all_comments = extract_all_comments(doc)
 
         # Filter for the specific paragraph
-        from server.docx_use_mcp.docx_use_server.core.comments import (
+        from Agents.server.docx_use_mcp.docx_use_server.core.comments import (
             get_comments_for_paragraph as core_get_comments_for_paragraph,
         )
         para_comments = core_get_comments_for_paragraph(all_comments, paragraph_index)

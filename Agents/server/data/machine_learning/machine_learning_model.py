@@ -39,8 +39,8 @@ from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.svm import SVC, SVR
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
-from server.data.data_process.data_preprocessing import _load_user_dataframe
-from server.data.machine_learning.param import get_model_param_spaces
+from Agents.server.data.data_process.data_preprocessing import _load_user_dataframe
+from Agents.server.data.machine_learning.param import get_model_param_spaces
 
 # === 模型映射（与旧版保持一致的 key） ===
 

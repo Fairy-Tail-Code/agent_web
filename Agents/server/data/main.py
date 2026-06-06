@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from server.data.data_process.router import processing_router
-from server.data.machine_learning.router import ml_router
+from Agents.server.data.data_process.router import processing_router
+from Agents.server.data.machine_learning.router import ml_router
 
 data_mcp_app = FastAPI()
 data_mcp_app.include_router(processing_router)

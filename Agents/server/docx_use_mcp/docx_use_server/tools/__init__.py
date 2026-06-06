@@ -7,14 +7,14 @@ to clients through the Model Context Protocol.
 
 # Document tools
 # Comment tools
-from server.docx_use_mcp.docx_use_server.tools.comment_tools import (
+from Agents.server.docx_use_mcp.docx_use_server.tools.comment_tools import (
     get_all_comments,
     get_comments_by_author,
     get_comments_for_paragraph,
 )
 
 # Content tools
-from server.docx_use_mcp.docx_use_server.tools.content_tools import (
+from Agents.server.docx_use_mcp.docx_use_server.tools.content_tools import (
     add_heading,
     add_page_break,
     add_paragraph,
@@ -24,7 +24,7 @@ from server.docx_use_mcp.docx_use_server.tools.content_tools import (
     delete_paragraph,
     search_and_replace,
 )
-from server.docx_use_mcp.docx_use_server.tools.document_tools import (
+from Agents.server.docx_use_mcp.docx_use_server.tools.document_tools import (
     copy_document,
     create_document,
     get_document_info,
@@ -35,7 +35,7 @@ from server.docx_use_mcp.docx_use_server.tools.document_tools import (
 )
 
 # Footnote tools
-from server.docx_use_mcp.docx_use_server.tools.footnote_tools import (
+from Agents.server.docx_use_mcp.docx_use_server.tools.footnote_tools import (
     add_endnote_to_document,
     add_footnote_to_document,
     convert_footnotes_to_endnotes_in_document,
@@ -43,14 +43,14 @@ from server.docx_use_mcp.docx_use_server.tools.footnote_tools import (
 )
 
 # Format tools
-from server.docx_use_mcp.docx_use_server.tools.format_tools import (
+from Agents.server.docx_use_mcp.docx_use_server.tools.format_tools import (
     create_custom_style,
     format_table,
     format_text,
 )
 
 # Protection tools
-from server.docx_use_mcp.docx_use_server.tools.protection_tools import (
+from Agents.server.docx_use_mcp.docx_use_server.tools.protection_tools import (
     add_digital_signature,
     add_restricted_editing,
     protect_document,

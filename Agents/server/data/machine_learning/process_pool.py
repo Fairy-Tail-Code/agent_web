@@ -3,7 +3,7 @@ import os
 from concurrent.futures import Future, ProcessPoolExecutor
 from typing import Any, Dict, Optional, Sequence, Union
 
-from server.data.machine_learning.machine_learning_model import train_model_once
+from Agents.server.data.machine_learning.machine_learning_model import train_model_once
 
 # === 多进程训练任务提交 ===
 
