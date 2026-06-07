@@ -32,7 +32,6 @@ LOGIN_SECURITY_ENABLED = os.getenv("LOGIN_SECURITY_ENABLED", "true").lower() == 
 class LoginRequest(BaseModel):
     email: str
     password: str
-    turnstile_token: str = ""
 
 
 class LoginResponse(BaseModel):
