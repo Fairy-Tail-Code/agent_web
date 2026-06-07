@@ -150,7 +150,7 @@ jobs:
 
             # 停止旧容器并启动
             docker compose -f docker-compose.prod.yaml down --remove-orphans
-            docker compose -f docker-compose.prod.yaml up -d --no-pull
+            docker compose -f docker-compose.prod.yaml up -d 
 
             # 等待启动完成
             echo "⏳ 等待容器启动..."
