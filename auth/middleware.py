@@ -21,10 +21,6 @@ PUBLIC_PATHS: frozenset[str] = frozenset({
     "/auth/login",
     "/auth/send-magic-link",
     "/auth/callback",
-    # nginx proxy_pass /backend/auth/* -> /auth/* 路径映射后的公开路径
-    "/send-magic-link",
-    "/login",
-    "/callback",
 })
 
 
