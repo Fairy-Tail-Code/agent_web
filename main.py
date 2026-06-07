@@ -10,7 +10,6 @@ def _get_bool_env(name: str, default: bool) -> bool:
         return default
     return raw.strip().lower() in {"1", "true", "yes", "y", "on"}
 
-
 if hasattr(asyncio, "WindowsSelectorEventLoopPolicy"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # ty:ignore[deprecated]
 
