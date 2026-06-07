@@ -21,6 +21,10 @@ local function is_public_path(path)
     if string.sub(path, 1, 5) == "/docs" or string.sub(path, 1, 6) == "/redoc" then
         return true
     end
+    -- 登录相关路径跳过 JWT 验证
+    if string.sub(path, 1, 14) == "/backend/auth" then
+        return true
+    end
     return false
 end
 
