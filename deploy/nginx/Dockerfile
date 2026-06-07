@@ -9,6 +9,7 @@ WORKDIR /build/frontend
 # 前端构建时需要的 Vite 环境变量（通过 build args 传入）
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
+ARG VITE_TURNSTILE_SITE_KEY
 
 COPY agent-web-fronted/package.json agent-web-fronted/package-lock.json ./
 COPY agent-web-fronted/index.html ./
@@ -23,6 +24,9 @@ COPY agent-web-fronted/src ./src
 RUN if [ -n "$VITE_SUPABASE_URL" ]; then \
       echo "VITE_SUPABASE_URL=$VITE_SUPABASE_URL" > .env && \
       echo "VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY" >> .env; \
+    fi
+RUN if [ -n "$VITE_TURNSTILE_SITE_KEY" ]; then \
+      echo "VITE_TURNSTILE_SITE_KEY=$VITE_TURNSTILE_SITE_KEY" >> .env; \
     fi
 
 RUN npm install --force --platform=linux

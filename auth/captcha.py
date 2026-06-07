@@ -31,6 +31,7 @@ async def verify_turnstile(token: str) -> bool:
         return True
 
     if not token:
+        logger.warning("Turnstile token is empty — CAPTCHA widget may have failed to load")
         return False
 
     if not TURNSTILE_SECRET_KEY:
@@ -49,7 +50,12 @@ async def verify_turnstile(token: str) -> bool:
                 timeout=10.0,
             )
             result = resp.json()
-            return result.get("success", False)
+            success = result.get("success", False)
+            if success:
+                logger.info(f"Turnstile verification passed (token prefix: {token[:8]}...)")
+            else:
+                logger.warning(f"Turnstile verification failed: {result}")
+            return success
     except Exception as e:
         # 网络异常，拒绝验证（避免因 Turnstile 服务不可用而绕过保护）
         logger.warning(f"Turnstile verification request failed: {e}")
