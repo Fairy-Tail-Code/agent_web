@@ -38,9 +38,17 @@ def _get_db_path() -> str:
     return os.getenv("DATA_DB_PATH", "./user_cache/data/data.db")
 
 
+def _ensure_db_dir(db_path: str) -> None:
+    """确保数据库目录存在"""
+    db_dir = os.path.dirname(db_path)
+    if db_dir and not os.path.exists(db_dir):
+        os.makedirs(db_dir, exist_ok=True)
+
+
 def ensure_login_logs_table() -> None:
     """确保 auth_login_logs 表存在"""
     db_path = _get_db_path()
+    _ensure_db_dir(db_path)
     conn = sqlite3.connect(db_path)
     try:
         conn.executescript(_CREATE_LOGIN_LOGS_TABLE)
@@ -70,6 +78,7 @@ def record_login_log(
         log_id
     """
     db_path = _get_db_path()
+    _ensure_db_dir(db_path)
     log_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
 
